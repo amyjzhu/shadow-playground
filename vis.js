@@ -76,6 +76,7 @@ if ( WEBGL.isWebGL2Available() === false ) {
   let raised_y = 1;
   let bitmap = [...Array(height)].map(x => [...Array(width)].map(f => false));
   bitmap[10][5] = true;
+  bitmap[8][2] = true;
 
   console.log(bitmap);
 
@@ -121,8 +122,8 @@ if ( WEBGL.isWebGL2Available() === false ) {
             geom.faces.push(new THREE.Face3(r_c1, r_c2, r_c4));
             geom.faces.push(new THREE.Face3(r_c1, r_c4, r_c3));  
             // south face 
-            geom.faces.push(new THREE.Face3(c1, c3, r_c3));
-            geom.faces.push(new THREE.Face3(c1, r_c3, r_c3));
+            geom.faces.push(new THREE.Face3(c1, r_c3, c3));
+            geom.faces.push(new THREE.Face3(c1, r_c1, r_c3));
             // east face
             geom.faces.push(new THREE.Face3(r_c3, c4, c3));
             geom.faces.push(new THREE.Face3(r_c4, c4, r_c3));
