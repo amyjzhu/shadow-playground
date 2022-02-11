@@ -59,6 +59,7 @@ if ( WEBGL.isWebGL2Available() === false ) {
   floorTexture.repeat.set(2, 2);
   
   var floorMaterial = new THREE.MeshBasicMaterial({ map: floorTexture, side: THREE.DoubleSide });
+  let altFloorMaterial = new THREE.MeshBasicMaterial({color: 0x6C6C6C, side: THREE.DoubleSide});
   var floorGeometry = new THREE.PlaneBufferGeometry(60, 60);
   var floor = new THREE.Mesh(floorGeometry, floorMaterial);
   floor.position.y = -0.1;
@@ -66,16 +67,67 @@ if ( WEBGL.isWebGL2Available() === false ) {
   scene.add(floor);
   floor.parent = worldFrame;
   
+// // generate a data textures corresponding to the colours
+// /*Data texture*/
+//   var side = 32; // power of two textures are better cause powers of two are required by some algorithms. Like ones that decide what color will pixel have if amount of pixels is less than amount of textels (see three.js console error when given non-power-of-two texture)
 
+//   var amount = Math.pow(side, 2); // you need 4 values for every pixel in side*side plane
+//   var data = new Float32Array(amount);
+// /* 
+//   You can also use any js typed array or ArrayBuffer itself
+//   Most popular is Uint8Array (it can contain itegers from 0 to 255)
+// */
+//   for (var i = 0; i < amount; i++) {
+//     data[i] = Math.random()*256; // generates random r,g,b,a values from 0 to 1
+//   /*  
+//     When using Uint8Array multiply the random value by 255 to get same results
+//     'cause in that case you use integers from 0 to 255 to represent colors
+//     which is limiting but is more widely supported (see comment below)
+//   */
+// }
+
+// var colourMap = new THREE.DataTexture(data, side, side, THREE.RGBFormat, THREE.FloatType);
+// console.log(colourMap);
+// colourMap.magFilter = THREE.NearestFilter; // also check out THREE.LinearFilter just to see the results
+// colourMap.needsUpdate = true; // somehow this line is required for this demo to work. I have not figured that out yet. 
+let stitch_height = 1;
+let stitch_width = 1;
+let width = 15;
+let height = 20;
+
+    let colourBitmap = [...Array(height).keys()].map(x => (x % 2 == 0)? [...Array(width)].map(f => true) : [...Array(width)].map(f => false));
+    let flatColourBitmap = colourBitmap.flat();
+    console.log(colourBitmap);
+
+    color1 = new THREE.Color(0xafafaf);
+	color2 = new THREE.Color(0x3f3f3f);
+
+	var size = width * height;
+	var pixelData = new Uint8Array( 3 * size );
+	for (var i = 0, len = size; i < len; i++) {
+		var i3 = i * 3;
+		var color = flatColourBitmap[i] ? color1 : color2;
+		// if(i >= 8) color = (color === color1) ? color2 : color1;
+		pixelData[i3] = 255 * color.r;
+		pixelData[i3+1] = 255 * color.g;
+		pixelData[i3+2] = 255 * color.b;
+	};
+	var format = THREE.RGBFormat,
+		type = THREE.UnsignedByteType;
+
+	let colourMap = new THREE.DataTexture(pixelData, width, height, format, type);
+    colourMap.wrapS = THREE.ClampToEdgeWrapping;
+    colourMap.wrapT = THREE.ClampToEdgeWrapping;
+    colourMap.needsUpdate = true;
+    console.log(colourMap);
   // idea: make a box with the given dimensions 
 
-  let stitch_height = 1.5;
-  let stitch_width = 1;
-  let width = 10;
-  let height = 20;
+
   let raised_y = 1;
   let bitmap = [...Array(height)].map(x => [...Array(width)].map(f => false));
   bitmap[10][5] = true;
+  bitmap[11][5] = true;
+  bitmap[10][6] = true;
   bitmap[8][2] = true;
 
   console.log(bitmap);
@@ -143,6 +195,8 @@ if ( WEBGL.isWebGL2Available() === false ) {
       }
   }
 
+  let max_y = stitch_height * height;
+  let max_x = stitch_width * width;
   add_depth = false;
   if (add_depth) {
   // we need to add the sides of the thing.
@@ -153,8 +207,6 @@ if ( WEBGL.isWebGL2Available() === false ) {
     let nw = height + 1;
     let ne = (width + 1) * (height + 1);
 
-    let max_y = stitch_height * height;
-    let max_x = stitch_width * width;
     let z_below = -5;
     
     let c1l = new THREE.Vector3(min_x, z_below, min_y);
@@ -197,17 +249,45 @@ if ( WEBGL.isWebGL2Available() === false ) {
   geom.computeFaceNormals();
   console.log(geom);
 
-  
+
   // UNIFORMS
   var knitPosition = {type: 'v3', value: new THREE.Vector3(0.0,0.0,0.0)};
-  var lightSource = {type: 'v3', value: new THREE.Vector3(0.0,0.0,0.0)};
-    
+  var lightSource = {type: 'v3', value: new THREE.Vector3(0.0,20.0,1.0)};
+  
+  var lightColor = new THREE.Color(1.0,1.0,1.0);
+//   var lightDirection = new THREE.Vector3(0.49,0.79, 0.49);
+  var lightDirection = new THREE.Vector3(0.0,1, 0.0);
+  
+  var lightColorUniform = {type: "c", value: lightColor};
+var lightDirectionUniform = {type: "v3", value: lightDirection};
+
+  // Material properties
+  var kAmbient = 0.4;
+  var kDiffuse = 0.8;
+var kAmbientUniform = {type: "f", value: kAmbient};
+var kDiffuseUniform = {type: "f", value: kDiffuse};
+
+let x_range = max_x; // assuming we start at zero
+let z_range = max_y; // assuming we start at zero
+let xRangeUniform = {type: "f", value: x_range};
+let zRangeUniform = {type: "f", value: z_range};
+
+  
+
   // MATERIALS: specifying uniforms and shaders
   var knitMaterial = new THREE.ShaderMaterial({
     uniforms: { 
         knitPosition: knitPosition,
         lightSource: lightSource,
-    }
+        colourMap: { type: "t", value: colourMap },
+
+        lightColor: lightColorUniform,
+        lightDirection: lightDirectionUniform,
+        kAmbient: kAmbientUniform,
+        kDiffuse: kDiffuseUniform,
+        xRange: xRangeUniform,
+        zRange: zRangeUniform,
+    },
   });
 
   
@@ -231,12 +311,22 @@ if ( WEBGL.isWebGL2Available() === false ) {
 
 
     // const circ = new THREE.SphereGeometry(15, 32, 16);
-    // const circle = new THREE.Mesh( circ, knitMaterial );
+    // const circle = new THREE.Mesh( circ,  new THREE.MeshLambertMaterial({
+    //     color: 0x6C6C6C
+    // }));
     // //   const cube = new THREE.Mesh( geom, material );
     // circle.position.set(0,20,0);
     // circle.parent = worldFrame;
     //   scene.add( circle );
     
+  const directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
+  
+  scene.add( directionalLight );
+  const light = new THREE.PointLight( 0xff0000, 1, 100 );
+light.position.set( 50, 50, 50 );
+scene.add( light );
+console.log(light);
+
       update();
 //   
   });
