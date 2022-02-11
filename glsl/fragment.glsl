@@ -9,7 +9,7 @@ in vec3 lightDirection;
 in vec3 colour;
 in vec2 vUv;
 in float z;
-uniform sampler2D colorMap;
+uniform sampler2D colourMap;
 
 uniform vec3 lightColor;
 uniform float kAmbient;
@@ -21,14 +21,7 @@ in vec3 cameraPos;
 
 void main() {
 
-    //float intensity = dot(normalize(lightDirection), interpolatedNormal);
-    //if (intensity < 0.0) {
-    //    intensity = 0.0;
-    //}
-    
-    vec3 mainColor = texture(colorMap, vUv).rgb;
-    //out_FragColor = vec4(mainColor, intensity);
-    //out_FragColor = vec4(colour, 1.0);
+    vec3 mainColor = texture(colourMap, vUv).rgb;
 
 	vec3 lightDir = normalize(lightDirection);
 	vec3 normal = normalize(normalizedNormal);

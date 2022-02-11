@@ -129,6 +129,7 @@ let height = 20;
   bitmap[11][5] = true;
   bitmap[10][6] = true;
   bitmap[8][2] = true;
+  bitmap[11][3] = true;
 
   console.log(bitmap);
 
@@ -262,8 +263,8 @@ let height = 20;
 var lightDirectionUniform = {type: "v3", value: lightDirection};
 
   // Material properties
-  var kAmbient = 0.4;
-  var kDiffuse = 0.8;
+  var kAmbient = 0.8;
+  var kDiffuse = 0.2;
 var kAmbientUniform = {type: "f", value: kAmbient};
 var kDiffuseUniform = {type: "f", value: kDiffuse};
 
@@ -310,14 +311,15 @@ let zRangeUniform = {type: "f", value: z_range};
     scene.add( cube );
 
 
-    // const circ = new THREE.SphereGeometry(15, 32, 16);
-    // const circle = new THREE.Mesh( circ,  new THREE.MeshLambertMaterial({
-    //     color: 0x6C6C6C
-    // }));
+    const circ = new THREE.SphereGeometry(15, 32, 16);
+    const circle = new THREE.Mesh( circ,  new THREE.MeshPhongMaterial({
+        // color: 0x6C6C6C
+        map: colourMap,
+    }));
     // //   const cube = new THREE.Mesh( geom, material );
     // circle.position.set(0,20,0);
     // circle.parent = worldFrame;
-    //   scene.add( circle );
+    //   scene.add( circle ); 
     
   const directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
   
