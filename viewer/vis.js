@@ -307,13 +307,6 @@ new THREE.SourceLoader().load(shaderFiles, function (shaders) {
   // circle.parent = worldFrame;
   //   scene.add( circle ); 
 
-  const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
-
-  scene.add(directionalLight);
-  const light = new THREE.PointLight(0xff0000, 1, 100);
-  light.position.set(50, 50, 50);
-  scene.add(light);
-  console.log(light);
 
   update();
 
