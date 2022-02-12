@@ -1,0 +1,8 @@
+container {
+    float: left;
+}
+
+canvas {
+    width: 640;
+    height: 800;
+}
