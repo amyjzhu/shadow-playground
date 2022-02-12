@@ -34,9 +34,6 @@ export default function App() {
         title={"Editor"}
       />
       <KnitViewer style={{ float: "right" }} rows={rows} />
-      <div id="viewer">
-        <Viewer style={{ float: "right" }} rows={rows} />
-      </div>
     </div>
   );
 }

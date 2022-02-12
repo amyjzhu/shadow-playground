@@ -8,8 +8,9 @@ export default class Viewer extends Component {
         if (prevProps.rows !== this.props.rows) {
                console.log('something prop has changed.');
                console.log(this.props.rows);
+               let raised = ["#673ab7", "#8a8a8a"];
                let newBitmap = this.props.rows.map(r => 
-                r.map(b => b == "#673ab7" ? false : true));
+                r.map(b => raised.includes(b) ? true : false));
                console.log(newBitmap);
                this.height = newBitmap.length;
                this.width = newBitmap[0].length;

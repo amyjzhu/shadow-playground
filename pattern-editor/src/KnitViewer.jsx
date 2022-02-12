@@ -1,5 +1,6 @@
 import React from "react";
 import DrawingPanel from "./DrawingPanel";
+import Viewer from "./Viewer";
 
 import { DARK, LIGHT, DARK_VALLEY, LIGHT_RIDGE } from "./constants";
 
@@ -24,8 +25,13 @@ export default function KnitViewer(props) {
   }
 
   return (
-    <div>
+    <div style={{ display: "flex" }}>
+      <div>
       <DrawingPanel rows={mapToKnitRows(rows)} title={"Viewer"} readOnly />
+      </div>
+      <div id="viewer">
+        <Viewer style={{ float: "right" }} rows={ mapToKnitRows(rows) } />
+      </div>
     </div>
   );
 }
