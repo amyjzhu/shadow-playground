@@ -1,2 +1,0 @@
-Run `http-server .` (or another similar utility e.g. python's simplehttpserver or whatever you use) and view the page in `localhost`.
-![Gif of a camera being moved around a flat striped plane with emerging blocks.](shadow2.gif)
