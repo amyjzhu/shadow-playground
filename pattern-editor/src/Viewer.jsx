@@ -3,6 +3,23 @@ import * as THREE from "three";
 import OrbitControls from 'three-orbitcontrols'
 // hopefully we can just use the three that's in the src/js/
 export default class Viewer extends Component {
+    rows = this.props.rows;
+    componentDidUpdate(prevProps, prevState) {
+        if (prevProps.rows !== this.props.rows) {
+               console.log('something prop has changed.');
+               console.log(this.props.rows);
+               let newBitmap = this.props.rows.map(r => 
+                r.map(b => b == "#673ab7" ? false : true));
+               console.log(newBitmap);
+               this.height = newBitmap.length;
+               this.width = newBitmap[0].length;
+               console.log(this.height, this.width);
+               this.replaceMesh(newBitmap);
+        }
+    }
+    
+    width = 41;
+    height = 41;
 
     componentDidMount() {
         // const script = document.createElement("script");
@@ -87,8 +104,9 @@ export default class Viewer extends Component {
 
         let stitch_height = 1;
         let stitch_width = 1;
-        let width = 41;
-        let height = 41;
+        this.width = 41;
+        this.height = 41;
+        let that = this;
 
         function generateStripedTexture(colourBitmap) {
             let flatColourBitmap = colourBitmap.flat();
@@ -97,7 +115,7 @@ export default class Viewer extends Component {
             let color1 = new THREE.Color(0xafafaf);
             let color2 = new THREE.Color(0x3f3f3f);
 
-            var size = width * height;
+            var size = that.width * that.height;
             var pixelData = new Uint8Array(3 * size);
             for (var i = 0, len = size; i < len; i++) {
                 var i3 = i * 3;
@@ -110,7 +128,7 @@ export default class Viewer extends Component {
             var format = THREE.RGBFormat,
                 type = THREE.UnsignedByteType;
 
-            let colourMap = new THREE.DataTexture(pixelData, width, height, format, type);
+            let colourMap = new THREE.DataTexture(pixelData, that.width, that.height, format, type);
             colourMap.wrapS = THREE.ClampToEdgeWrapping;
             colourMap.wrapT = THREE.ClampToEdgeWrapping;
             colourMap.needsUpdate = true;
@@ -121,8 +139,8 @@ export default class Viewer extends Component {
 
         let raised_y = 0.5;
 
-        let max_y = stitch_height * height;
-        let max_x = stitch_width * width;
+        let max_y = stitch_height * this.height;
+        let max_x = stitch_width * this.width;
 
         // generate our own geometry for the box
         // TODO: this is supposed to be deprecated in newest three.js
@@ -133,8 +151,8 @@ export default class Viewer extends Component {
         function generateRaisedMesh(bitmap) {
             let geom = new THREE.Geometry();
             // start by making a bunch of vertices.
-            for (let h = 0; h <= height; h++) {
-                for (let w = 0; w <= width; w++) {
+            for (let h = 0; h <= that.height; h++) {
+                for (let w = 0; w <= that.width; w++) {
                     let z = h * stitch_height;
                     let x = w * stitch_width;
                     geom.vertices.push(new THREE.Vector3(x, 0, z));
@@ -144,10 +162,10 @@ export default class Viewer extends Component {
             }
 
             // now connect the faces
-            for (let h = 0; h < height; h++) {
-                for (let w = 0; w < width; w++) {
+            for (let h = 0; h < that.height; h++) {
+                for (let w = 0; w < that.width; w++) {
                     // TODO just duplicating faces now, there's definitely a more optimal way
-                    let across = width + 1;
+                    let across = that.width + 1;
                     // do I need to index from ALL vertices? 
                     let c1 = 2 * (across * h + w);
                     let c2 = 2 * (across * (h + 1) + w);
@@ -193,9 +211,9 @@ export default class Viewer extends Component {
                 let min_x = 0;
                 let min_y = 0;
                 let sw = 0;
-                let se = width + 1;
-                let nw = height + 1;
-                let ne = (width + 1) * (height + 1);
+                let se = that.width + 1;
+                let nw = that.height + 1;
+                let ne = (that.width + 1) * (that.height + 1);
 
                 let z_below = -5;
 
@@ -263,7 +281,7 @@ export default class Viewer extends Component {
         let xRangeUniform = { type: "f", value: x_range };
         let zRangeUniform = { type: "f", value: z_range };
 
-        let colourBitmap = [...Array(height).keys()].map(x => (x % 2 == 0) ? [...Array(width)].map(f => true) : [...Array(width)].map(f => false));
+        let colourBitmap = [...Array(this.height).keys()].map(x => (x % 2 == 0) ? [...Array(this.width)].map(f => true) : [...Array(this.width)].map(f => false));
         let colourMap = generateStripedTexture(colourBitmap);
 
         // MATERIALS: specifying uniforms and shaders
@@ -283,7 +301,7 @@ export default class Viewer extends Component {
         });
 
 
-        let bitmap = [...Array(height)].map(x => [...Array(width)].map(f => false));
+        let bitmap = [...Array(this.height)].map(x => [...Array(this.width)].map(f => false));
         bitmap[10][5] = true;
         bitmap[11][5] = true;
         bitmap[10][6] = true;
@@ -418,11 +436,21 @@ void main() {
 
             update();
 
-
+            this.replaceMesh = (newBitmap) => {
+                console.log(cube);
+                cube.geometry = generateRaisedMesh(newBitmap);
+                cube.needsUpdate = true;
+            }
+    
+            this.replaceTexture = (newBitmap) => {
+                console.log(cube);
+                cube.material.uniforms.colourMap = generateStripedTexture(newBitmap);
+                cube.needsUpdate = true;
+            }
 
             let newBitmap = getCircle();
             // newBitmap[5][8] = true;
-            replaceMesh(newBitmap);
+            this.replaceMesh(newBitmap);
             //   
         
 
@@ -434,17 +462,6 @@ void main() {
             renderer.render(scene, camera);
         }
 
-        function replaceMesh(newBitmap) {
-            console.log(cube);
-            cube.geometry = generateRaisedMesh(newBitmap);
-            cube.needsUpdate = true;
-        }
-
-        function replaceTexture(newBitmap) {
-            console.log(cube);
-            cube.material.uniforms.colourMap = generateStripedTexture(newBitmap);
-            cube.needsUpdate = true;
-        }
 
         function getCircle() {
             let bitmap = `11111111111111111111111111111111111111111
