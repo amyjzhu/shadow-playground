@@ -27,10 +27,10 @@ export default function KnitViewer(props) {
   return (
     <div style={{ display: "flex" }}>
       <div>
-      <DrawingPanel rows={mapToKnitRows(rows)} title={"Viewer"} readOnly />
+        <DrawingPanel rows={mapToKnitRows(rows)} title={"Pattern"} readOnly />
       </div>
       <div id="viewer">
-        <Viewer style={{ float: "right" }} rows={ mapToKnitRows(rows) } />
+        <Viewer style={{ float: "right" }} rows={mapToKnitRows(rows)} />
       </div>
     </div>
   );
