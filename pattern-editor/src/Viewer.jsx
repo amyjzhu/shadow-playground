@@ -105,18 +105,54 @@ export default class Viewer extends Component {
 
         let stitch_height = 1;
         let stitch_width = 1;
-        this.width = 41;
-        this.height = 41;
+        // this.width = 41;
+        // this.height = 41;
+        this.width = 29;
+        this.height = 33;
         let that = this;
+
+        function generateColouredTexture(colourBitmap) {
+            let flatColourBitmap = colourBitmap.flat();
+            console.log(colourBitmap);
+
+            var size = that.width * that.height;
+            console.log("size is " + size);
+
+            var pixelData = new Uint8Array(3 * size);
+            for (var i = 0, len = size; i < len; i++) {
+                let colour = new THREE.Color(flatColourBitmap[i]);
+                //console.log(colour);
+    
+                var i3 = i * 3;
+                
+                // if(i >= 8) color = (color === color1) ? color2 : color1;
+                pixelData[i3] = 255 * colour.r;
+                pixelData[i3 + 1] = 255 * colour.g;
+                pixelData[i3 + 2] = 255 * colour.b;
+            };
+            var format = THREE.RGBFormat,
+                type = THREE.UnsignedByteType;
+
+            let colourMap = new THREE.DataTexture(pixelData, that.width, that.height, format, type);
+            colourMap.wrapS = THREE.ClampToEdgeWrapping;
+            colourMap.wrapT = THREE.ClampToEdgeWrapping;
+            colourMap.needsUpdate = true;
+            console.log(colourMap);
+            // idea: make a box with the given dimensions 
+            return colourMap;
+        }
 
         function generateStripedTexture(colourBitmap) {
             let flatColourBitmap = colourBitmap.flat();
             console.log(colourBitmap);
-
-            let color1 = new THREE.Color(0xafafaf);
-            let color2 = new THREE.Color(0x3f3f3f);
+            // let color1 = new THREE.Color(0xafafaf);
+            // let color2 = new THREE.Color(0x3f3f3f);
+            let color1 = new THREE.Color("#de1e7e");
+            let color2 = new THREE.Color("#F0FEAF");
 
             var size = that.width * that.height;
+            
+            console.log("size is " + size + " with " + that.width + " " + that.height);
             var pixelData = new Uint8Array(3 * size);
             for (var i = 0, len = size; i < len; i++) {
                 var i3 = i * 3;
@@ -352,8 +388,8 @@ void main() {
 
 	//TOTAL
 	vec3 TOTAL = light_AMB + light_DFF;
-	out_FragColor = vec4(TOTAL, 1.0);
-	//out_FragColor = vec4(mainColor, 1.0);
+	//out_FragColor = vec4(TOTAL, 1.0);
+	out_FragColor = vec4(mainColor, 1.0);
 	
 }
 `;
@@ -443,15 +479,32 @@ void main() {
                 cube.needsUpdate = true;
             }
     
-            this.replaceTexture = (newBitmap) => {
+            this.replaceStripedTexture = (newBitmap) => {
                 console.log(cube);
-                cube.material.uniforms.colourMap = generateStripedTexture(newBitmap);
+                cube.material.uniforms.xRange.value = this.width * stitch_width;
+                cube.material.uniforms.zRange.value = this.height * stitch_height;
+                cube.material.uniforms.colourMap.value = generateStripedTexture(newBitmap);
+                cube.needsUpdate.value = true;
+            }
+
+            this.replaceColourTexture = (newBitmap) => {
+                console.log(cube);
+                cube.material.uniforms.xRange.value = this.width * stitch_width;
+                cube.material.uniforms.zRange.value = this.height * stitch_height;
+                cube.material.uniforms.colourMap.value = generateColouredTexture(newBitmap);
                 cube.needsUpdate = true;
             }
 
-            let newBitmap = getCircle();
+            this.width = 32;
+            this.height = 29;
+            
+            let newBitmap = getStar();
             // newBitmap[5][8] = true;
             this.replaceMesh(newBitmap);
+            let newColourTexture = getStarColour();
+            // generateColouredTexture(newColourTexture);
+            this.replaceColourTexture(newColourTexture);
+            update();
             //   
         
 
@@ -463,6 +516,12 @@ void main() {
             renderer.render(scene, camera);
         }
 
+        function from01Bitmap(bitmap) {
+            let lines = bitmap.split("\n");
+            let map = lines.map(str => str.split("").map(v => v == "0" ? false : true));
+            console.log(map);
+            return map;
+        }
 
         function getCircle() {
             let bitmap = `11111111111111111111111111111111111111111
@@ -506,18 +565,92 @@ void main() {
   11111111111111111111111111111111111111111
   00000000000000000000000000000000000000000
   11111111111111111111111111111111111111111`
-            let lines = bitmap.split("\n");
-            let map = lines.map(str => str.split("").map(v => v == "0" ? false : true));
-            console.log(lines);
-            console.log(map);
-            return map;
+            return from01Bitmap(bitmap);
         }
 
+        function getStar() {
+            let star = `00000000000000000000000000000000
+11111111111111111111111111111111
+00000000000000000000000000000000
+11111111111111111111111111111111
+00000000000000000000000000000000
+11111111111100000000001111111111
+00000000000111111111101000000000
+11111111100000000000000001111111
+00000000101111111110001110000000
+11111111000000000000000000111111
+00000001110000001000001111100000
+11111100000000000000000000001111
+00000011111000000000001111110000
+11111100000000000000000000001111
+00000011111110000000000000110000
+11111100000000000000000000001111
+00000011111110000000001111110000
+11111100000000000000000000001111
+00000001111000000000001111100000
+11111110000000000000000000011111
+00000000110111111110001110000000
+11111111000000000000000001111111
+00000000000111111111001000000000
+11111111111000000000000111111111
+00000000000000000000000000000000
+11111111111111111111111111111111
+00000000000000000000000000000000
+11111111111111111111111111111111
+00000000000000000000000000000000`
+// reversed in order to fix viewing angle
+            // return from01Bitmap(star).map(x => x.reverse()).reverse();
+            return from01Bitmap(star).reverse();
+            // return from01Bitmap(star);
+        }
+
+        function getStarColour() {
+            let star_colour = `00000000000000000000000000000000
+11111111111111111111111111111111
+00000000000000000000000000000000
+11111111111111111111111111111111
+00000000000000000000000000000000
+11111111111111111111101111111111
+00000000000000000000000000000000
+11111111101111111110001111111111
+00000000000000000000000000000000
+11111111110000001000001111111111
+00000000000000000000000000000000
+11111111111000000000001111111111
+00000000000000000000000000000000
+11111111111110000000000000111111
+00000000000000000000000000000000
+11111111111110000000000000111111
+00000000000000000000000000000000
+11111111111000000000001111111111
+00000000000000000000000000000000
+11111111110000001000001111111111
+00000000000000000000000000000000
+11111111101111111110001111111111
+00000000000000000000000000000000
+11111111111111111111101111111111
+00000000000000000000000000000000
+11111111111111111111111111111111
+00000000000000000000000000000000
+11111111111111111111111111111111
+00000000000000000000000000000000`
+
+            
+            let lines = star_colour.split("\n");
+            let map = lines.map(str => str.split("").map(v => v == "0" ? "#de1e7e" : "#F0FEAF"));
+            // let map = lines.map(str => str.split("").map(v => v == "0" ? "#de1e7e" : "#F0FEAF").reverse());
+            console.log(new THREE.Color("#de1e7e"));
+            console.log(map);
+            console.log(lines);
+            return map.reverse();
+            // return map;
+        }
 
         update();
 
 
     }
+    
 
     render() {
         return (
