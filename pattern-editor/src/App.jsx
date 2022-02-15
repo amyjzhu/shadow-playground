@@ -1,48 +1,68 @@
 import React, { useState } from "react";
 import TextField from "@material-ui/core/TextField";
 import { CompactPicker } from "react-color";
+import Radio from "@mui/material/Radio";
+import RadioGroup from "@mui/material/RadioGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import FormControl from "@mui/material/FormControl";
+import FormLabel from "@mui/material/FormLabel";
 
-import { HEIGHT, WIDTH } from "./constants";
+import { HEIGHT, WIDTH, RAISED, FLAT } from "./constants";
 import "./styles/App.scss";
 import DrawingPanel from "./DrawingPanel";
 import Viewer from "./Viewer";
 
 export default function App() {
-  let defaultRows = [];
+  let defaultColorMap = [];
+  let defaultStitchMap = [];
   for (let row = 0; row < HEIGHT; row++) {
-    let newRow = [];
+    let colorRow = [];
+    let stitchRow = [];
     for (let col = 0; col < WIDTH; col++) {
-      newRow.push("#fff");
+      colorRow.push("#fff");
+      stitchRow.push(FLAT);
     }
-    defaultRows.push(newRow);
+    defaultColorMap.push(colorRow);
+    defaultStitchMap.push(stitchRow);
   }
 
   let [selectedColor, setSelectedColor] = useState("#653294");
-  let [rows, setRows] = useState(defaultRows);
+  let [stitchType, setStitchType] = useState(RAISED);
+  let [colorMap, setColorMap] = useState(defaultColorMap);
+  let [stitchMap, setStitchMap] = useState(defaultStitchMap);
   let [width, setWidth] = useState(WIDTH);
   let [height, setHeight] = useState(HEIGHT);
 
   function resize(newWidth, newHeight) {
-    let oldRows = rows;
-    let newRows = [];
+    let newColorMap = [];
+    let newStitchMap = [];
     for (let row = 0; row < newHeight; row++) {
-      let newRow = [];
+      let colorRow = [];
+      let stitchRow = [];
       for (let col = 0; col < newWidth; col++) {
-        if (oldRows[row] && oldRows[row][col]) {
-          newRow.push(oldRows[row][col]);
+        if (colorMap[row] && colorMap[row][col]) {
+          colorRow.push(colorMap[row][col]);
+          stitchRow.push(stitchMap[row][col]);
         } else {
-          newRow.push("#fff");
+          colorRow.push("#fff");
+          stitchRow.push(FLAT);
         }
       }
-      newRows.push(newRow);
+      newColorMap.push(colorRow);
+      newStitchMap.push(stitchRow);
     }
-    setRows(newRows);
+    setColorMap(newColorMap);
+    setStitchMap(newStitchMap);
   }
 
   function updatePixel(row, col) {
-    let newRows = [...rows];
-    newRows[row][col] = selectedColor;
-    setRows(newRows);
+    let newColorMap = [...colorMap];
+    newColorMap[row][col] = selectedColor;
+    setColorMap(newColorMap);
+
+    let newStitchMap = [...stitchMap];
+    newStitchMap[row][col] = stitchType;
+    setStitchMap(newStitchMap);
   }
 
   function handleChangeHeight(e) {
@@ -85,6 +105,20 @@ export default function App() {
           onBlur={handleChangeWidth}
         />
       </div>
+      <FormControl>
+        <FormLabel id="demo-row-radio-buttons-group-label">
+          Stitch Type
+        </FormLabel>
+        <RadioGroup
+          row
+          name="row-radio-buttons-group"
+          value={stitchType}
+          onChange={(e) => setStitchType(parseInt(e.target.value))}
+        >
+          <FormControlLabel value={RAISED} control={<Radio />} label="Raised" />
+          <FormControlLabel value={FLAT} control={<Radio />} label="Flat" />
+        </RadioGroup>
+      </FormControl>
       <CompactPicker
         color={selectedColor}
         onChangeComplete={(color) => setSelectedColor(color.hex)}
@@ -92,12 +126,13 @@ export default function App() {
       <div style={{ display: "flex" }} className="App">
         <DrawingPanel
           style={{ float: "left" }}
-          rows={rows}
+          colorMap={colorMap}
+          stitchMap={stitchMap}
           updatePixel={updatePixel}
           title={"Editor"}
         />
         <div id="viewer">
-          <Viewer style={{ float: "right" }} rows={rows} />
+          <Viewer style={{ float: "right" }} rows={colorMap} />
         </div>
       </div>
     </div>

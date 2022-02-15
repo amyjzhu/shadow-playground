@@ -123,6 +123,13 @@ code {
   }
 }
 
+.dot {
+  height: 5px;
+  width: 5px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
 .row {
   display: flex;
   width: fit-content;
