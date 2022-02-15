@@ -90,10 +90,10 @@ export default class Viewer extends Component {
         window.addEventListener('resize', resize);
         resize();
 
-        //SCROLLBAR FUNCTION DISABLE
-        window.onscroll = function () {
-            window.scrollTo(0, 0);
-        }
+        // //SCROLLBAR FUNCTION DISABLE
+        // window.onscroll = function () {
+        //     window.scrollTo(0, 0);
+        // }
 
         // WORLD COORDINATE FRAME: other objects are defined with respect to it
         var worldFrame = new THREE.AxesHelper(5);
