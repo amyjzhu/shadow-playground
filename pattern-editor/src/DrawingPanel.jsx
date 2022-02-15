@@ -3,14 +3,15 @@ import React from "react";
 // to add multi-color support but for now it's not needed.
 // import { CirclePicker } from "react-color";
 import Pixel from "./Pixel";
+import Viewer from "./Viewer";
 
 export default function DrawingPanel(props) {
   const { rows, readOnly, title } = props;
   return (
-    <div id="editor">
+    <div className="editor">
       <h1>{title}</h1>
-      <div id="drawingPanel">
-        <div id="pixels">
+      <div className="drawingPanel">
+        <div className="pixels">
           {rows.map((row, i) => (
             <div className="row" key={i}>
               {row.map((pixel, j) => (

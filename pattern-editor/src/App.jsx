@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { HEIGHT, WIDTH } from "./constants";
 import "./styles/App.scss";
 import DrawingPanel from "./DrawingPanel";
-import KnitViewer from "./KnitViewer";
 import Viewer from "./Viewer";
 
 export default function App() {
@@ -33,7 +32,9 @@ export default function App() {
         updatePixel={updatePixel}
         title={"Editor"}
       />
-      <KnitViewer style={{ float: "right" }} rows={rows} />
+      <div id="viewer">
+        <Viewer style={{ float: "right" }} rows={rows} />
+      </div>
     </div>
   );
 }
