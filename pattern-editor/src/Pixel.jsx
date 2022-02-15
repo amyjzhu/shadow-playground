@@ -2,16 +2,7 @@ import React from "react";
 import { DARK, LIGHT } from "./constants";
 
 export default function Pixel(props) {
-  const { color, readOnly, setColor } = props;
-
-  // TODO: Make this work for click and drag
-  function onChange() {
-    if (readOnly) {
-      return;
-    }
-
-    setColor(color === DARK ? LIGHT : DARK); // toggle
-  }
+  const { color, readOnly, onChange } = props;
 
   return (
     <div

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import TextField from "@material-ui/core/TextField";
+import { CompactPicker } from "react-color";
 
 import { HEIGHT, WIDTH } from "./constants";
 import "./styles/App.scss";
@@ -15,6 +16,11 @@ export default function App() {
     }
     defaultRows.push(newRow);
   }
+
+  let [selectedColor, setSelectedColor] = useState("#653294");
+  let [rows, setRows] = useState(defaultRows);
+  let [width, setWidth] = useState(WIDTH);
+  let [height, setHeight] = useState(HEIGHT);
 
   function resize(newWidth, newHeight) {
     let oldRows = rows;
@@ -33,13 +39,9 @@ export default function App() {
     setRows(newRows);
   }
 
-  let [rows, setRows] = useState(defaultRows);
-  let [width, setWidth] = useState(WIDTH);
-  let [height, setHeight] = useState(HEIGHT);
-
-  function updatePixel(row, col, color) {
+  function updatePixel(row, col) {
     let newRows = [...rows];
-    newRows[row][col] = color;
+    newRows[row][col] = selectedColor;
     setRows(newRows);
   }
 
@@ -83,6 +85,10 @@ export default function App() {
           onBlur={handleChangeWidth}
         />
       </div>
+      <CompactPicker
+        color={selectedColor}
+        onChangeComplete={(color) => setSelectedColor(color.hex)}
+      />
       <div style={{ display: "flex" }} className="App">
         <DrawingPanel
           style={{ float: "left" }}
