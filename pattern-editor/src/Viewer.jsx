@@ -8,17 +8,26 @@ export default class Viewer extends Component {
         if (prevProps.rows !== this.props.rows) {
                console.log('something prop has changed.');
                console.log(this.props.rows);
-               let raised = ["#673ab7", "#8a8a8a"];
-               let newBitmap = this.props.rows.map(r => 
-                r.map(b => raised.includes(b) ? true : false));
+               let newBitmap = this.props.rows
                console.log(newBitmap);
                this.height = newBitmap.length;
                this.width = newBitmap[0].length;
                console.log(this.height, this.width);
                this.replaceMesh(newBitmap);
-               let colourBitmap = [...Array(this.height).keys()].map(x => (x % 2 == 0) ? [...Array(this.width)].map(f => true) : [...Array(this.width)].map(f => false));
-               this.replaceStripedTexture(colourBitmap);
+            //    let colourBitmap = [...Array(this.height).keys()].map(x => (x % 2 == 0) ? [...Array(this.width)].map(f => true) : [...Array(this.width)].map(f => false));
+            //    this.replaceStripedTexture(colourBitmap);
         }
+
+        if (prevProps.colours !== this.props.colours) {
+            console.log('something prop has changed.');
+            console.log(this.props.colours);
+            let raised = ["#673ab7", "#8a8a8a"];
+            let newBitmap = this.props.colours;
+            this.height = newBitmap.length;
+            this.width = newBitmap[0].length;
+            console.log(this.height, this.width);
+            this.replaceColourTexture(newBitmap);
+     }
     }
     
     width = 41;

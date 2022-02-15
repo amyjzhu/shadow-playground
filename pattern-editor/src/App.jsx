@@ -132,7 +132,7 @@ export default function App() {
           title={"Editor"}
         />
         <div id="viewer">
-          <Viewer style={{ float: "right" }} rows={colorMap} />
+          <Viewer style={{ float: "right" }} rows={stitchMap} colours={colorMap} />
         </div>
       </div>
     </div>
