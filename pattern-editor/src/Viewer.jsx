@@ -16,6 +16,8 @@ export default class Viewer extends Component {
                this.width = newBitmap[0].length;
                console.log(this.height, this.width);
                this.replaceMesh(newBitmap);
+               let colourBitmap = [...Array(this.height).keys()].map(x => (x % 2 == 0) ? [...Array(this.width)].map(f => true) : [...Array(this.width)].map(f => false));
+               this.replaceStripedTexture(colourBitmap);
         }
     }
     
@@ -436,6 +438,7 @@ void main() {
             gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
         
             // roll your own uv coords, pretty simple: http://paulyg.f2s.com/uv.htm
+            // vUv = vec2((position.x + 0.5) / xRange, (position.z + 0.5) / zRange);
             vUv = vec2(position.x / xRange, position.z / zRange);
             //vUv = uv;
             colour = position;
@@ -484,7 +487,7 @@ void main() {
                 cube.material.uniforms.xRange.value = this.width * stitch_width;
                 cube.material.uniforms.zRange.value = this.height * stitch_height;
                 cube.material.uniforms.colourMap.value = generateStripedTexture(newBitmap);
-                cube.needsUpdate.value = true;
+                cube.needsUpdate = true;
             }
 
             this.replaceColourTexture = (newBitmap) => {
