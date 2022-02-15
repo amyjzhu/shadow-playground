@@ -298,6 +298,33 @@ export default class Viewer extends Component {
             return geom;
         }
 
+        let generateSideTextureMap = (raisedFlatBitmap) => {
+            // we want a map that says "right" or "left" side
+            let size = (that.height) * (that.width + 1);
+            const data = new Uint8Array(size);
+
+            // uint8array is filled with zero by default
+            let left = 1;
+            let right = 2;
+
+            for (let i = 0; i < raisedFlatBitmap.length; i++) {
+                let row = raisedFlatBitmap[i];
+                for (let j = 0; j < row.length; j++) {
+                    let index = i * (that.width + 1) + j; 
+                    data[index] = left; 
+                    data[index + 1] = right;
+                }
+            }
+
+            const texture = new THREE.DataTexture(data, size, size, THREE.LuminanceAlphaFormat, THREE.UnsignedByteType);
+            
+            texture.wrapS = THREE.ClampToEdgeWrapping;
+            texture.wrapT = THREE.ClampToEdgeWrapping;
+
+            console.log(data);
+            return texture;
+        }
+
         // UNIFORMS
         var knitPosition = { type: 'v3', value: new THREE.Vector3(0.0, 0.0, 0.0) };
         var lightSource = { type: 'v3', value: new THREE.Vector3(0.0, 20.0, 1.0) };
@@ -479,6 +506,7 @@ void main() {
             this.replaceMesh = (newBitmap) => {
                 console.log(cube);
                 cube.geometry = generateRaisedMesh(newBitmap);
+                generateSideTextureMap(newBitmap);
                 cube.needsUpdate = true;
             }
     
