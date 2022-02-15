@@ -390,8 +390,8 @@ void main() {
 
 	//TOTAL
 	vec3 TOTAL = light_AMB + light_DFF;
-	//out_FragColor = vec4(TOTAL, 1.0);
-	out_FragColor = vec4(mainColor, 1.0);
+	out_FragColor = vec4(TOTAL, 1.0);
+	// out_FragColor = vec4(mainColor, 1.0);
 	
 }
 `;
