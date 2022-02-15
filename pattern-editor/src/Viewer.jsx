@@ -694,7 +694,10 @@ void main() {
 
     render() {
         return (
-          <div ref={ref => (this.mount = ref)} />
+          <div className="editor">
+            <h1>Visualizer</h1>
+            <div ref={(ref) => (this.mount = ref)} />
+          </div>
         )
       }
 }
