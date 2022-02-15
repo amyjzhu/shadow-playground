@@ -1,8 +1,7 @@
 import React from "react";
-import { DARK, LIGHT } from "./constants";
 
 export default function Pixel(props) {
-  const { color, readOnly, onChange } = props;
+  const { color, onChange } = props;
 
   return (
     <div
