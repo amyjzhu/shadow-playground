@@ -9,7 +9,7 @@ export default class Viewer extends Component {
                console.log('something prop has changed.');
                console.log(this.props.rows);
                let raised = ["#673ab7", "#8a8a8a"];
-               let newBitmap = this.props.rows.map(r =>
+               let newBitmap = this.props.rows.map(r => 
                 r.map(b => raised.includes(b) ? true : false));
                console.log(newBitmap);
                this.height = newBitmap.length;
@@ -20,7 +20,7 @@ export default class Viewer extends Component {
                this.replaceStripedTexture(colourBitmap);
         }
     }
-
+    
     width = 41;
     height = 41;
 
@@ -124,9 +124,9 @@ export default class Viewer extends Component {
             for (var i = 0, len = size; i < len; i++) {
                 let colour = new THREE.Color(flatColourBitmap[i]);
                 //console.log(colour);
-
+    
                 var i3 = i * 3;
-
+                
                 // if(i >= 8) color = (color === color1) ? color2 : color1;
                 pixelData[i3] = 255 * colour.r;
                 pixelData[i3 + 1] = 255 * colour.g;
@@ -140,7 +140,7 @@ export default class Viewer extends Component {
             colourMap.wrapT = THREE.ClampToEdgeWrapping;
             colourMap.needsUpdate = true;
             console.log(colourMap);
-            // idea: make a box with the given dimensions
+            // idea: make a box with the given dimensions 
             return colourMap;
         }
 
@@ -153,7 +153,7 @@ export default class Viewer extends Component {
             let color2 = new THREE.Color("#F0FEAF");
 
             var size = that.width * that.height;
-
+            
             console.log("size is " + size + " with " + that.width + " " + that.height);
             var pixelData = new Uint8Array(3 * size);
             for (var i = 0, len = size; i < len; i++) {
@@ -172,7 +172,7 @@ export default class Viewer extends Component {
             colourMap.wrapT = THREE.ClampToEdgeWrapping;
             colourMap.needsUpdate = true;
             console.log(colourMap);
-            // idea: make a box with the given dimensions
+            // idea: make a box with the given dimensions 
             return colourMap;
         }
 
@@ -205,7 +205,7 @@ export default class Viewer extends Component {
                 for (let w = 0; w < that.width; w++) {
                     // TODO just duplicating faces now, there's definitely a more optimal way
                     let across = that.width + 1;
-                    // do I need to index from ALL vertices?
+                    // do I need to index from ALL vertices? 
                     let c1 = 2 * (across * h + w);
                     let c2 = 2 * (across * (h + 1) + w);
                     let c3 = 2 * (across * h + w + 1);
@@ -222,7 +222,7 @@ export default class Viewer extends Component {
                         // top face
                         geom.faces.push(new THREE.Face3(r_c1, r_c2, r_c4));
                         geom.faces.push(new THREE.Face3(r_c1, r_c4, r_c3));
-                        // south face
+                        // south face 
                         geom.faces.push(new THREE.Face3(c1, r_c3, c3));
                         geom.faces.push(new THREE.Face3(c1, r_c1, r_c3));
                         // east face
@@ -382,7 +382,7 @@ void main() {
 	vec3 TOTAL = light_AMB + light_DFF;
 	out_FragColor = vec4(TOTAL, 1.0);
 	// out_FragColor = vec4(mainColor, 1.0);
-
+	
 }
 `;
 
@@ -393,39 +393,39 @@ void main() {
         uniform vec3 lightPosition;
         uniform float xRange;
         uniform float zRange;
-
+        
         // HINT: YOU WILL NEED AN ADDITIONAL UNIFORM VARIABLE TO MAKE THE BUNNY HOP
-
+        
         // Create shared variable for the vertex and fragment shaders
-
+        
         out vec2 vUv;
         out vec3 interpolatedNormal;
         out vec3 lightDirection;
         out vec3 colour;
         out float z;
-
+        
         out vec3 normalizedNormal;
         out vec3 cameraPos;
         out vec3 pos;
-
+        
         void main() {
             interpolatedNormal = normal;
             vec4 worldLightPosition = modelMatrix * vec4(lightPosition, 1.0);
             vec4 worldVertexPosition = (modelMatrix * vec4(position, 1.0)) + modelMatrix * vec4(knitPosition,1.0);
-
+        
             // assuming this is the correct direction of light
             vec4 dir = worldVertexPosition - worldLightPosition;
             lightDirection = dir.xyz;
-
+        
             normalizedNormal = normalize(normal);
-
+            
             cameraPos = cameraPosition;
             pos = (modelMatrix * vec4(position, 1.0)).xyz;
-
-            // Multiply each vertex by the model matrix to get the world position of each vertex, then the view matrix to get the position in the camera coordinate system,
+        
+            // Multiply each vertex by the model matrix to get the world position of each vertex, then the view matrix to get the position in the camera coordinate system, 
             // and finally the projection matrix to get final vertex position
             gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
-
+        
             // roll your own uv coords, pretty simple: http://paulyg.f2s.com/uv.htm
             // vUv = vec2((position.x + 0.5) / xRange, (position.z + 0.5) / zRange);
             vUv = vec2(position.x / xRange, position.z / zRange);
@@ -460,7 +460,7 @@ void main() {
             // //   const cube = new THREE.Mesh( geom, material );
             // circle.position.set(0,20,0);
             // circle.parent = worldFrame;
-            //   scene.add( circle );
+            //   scene.add( circle ); 
 
 
             update();
@@ -470,7 +470,7 @@ void main() {
                 cube.geometry = generateRaisedMesh(newBitmap);
                 cube.needsUpdate = true;
             }
-
+    
             this.replaceStripedTexture = (newBitmap) => {
                 console.log(cube);
                 cube.material.uniforms.xRange.value = this.width * stitch_width;
@@ -489,7 +489,7 @@ void main() {
 
             this.width = 32;
             this.height = 29;
-
+            
             let newBitmap = getStar();
             // newBitmap[5][8] = true;
             this.replaceMesh(newBitmap);
@@ -497,8 +497,8 @@ void main() {
             // generateColouredTexture(newColourTexture);
             this.replaceColourTexture(newColourTexture);
             update();
-            //
-
+            //   
+        
 
         //   const geom = new THREE.BoxGeometry( stitch_width * width, 1, stitch_height * height );
 
@@ -627,7 +627,7 @@ void main() {
 11111111111111111111111111111111
 00000000000000000000000000000000`
 
-
+            
             let lines = star_colour.split("\n");
             let map = lines.map(str => str.split("").map(v => v == "0" ? "#de1e7e" : "#F0FEAF"));
             // let map = lines.map(str => str.split("").map(v => v == "0" ? "#de1e7e" : "#F0FEAF").reverse());
@@ -642,7 +642,7 @@ void main() {
 
 
     }
-
+    
 
     render() {
         return (
