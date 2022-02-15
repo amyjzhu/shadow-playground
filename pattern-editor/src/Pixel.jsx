@@ -1,23 +1,20 @@
 import React from "react";
-import { DARK, LIGHT } from "./constants";
+import { RAISED } from "./constants";
 
 export default function Pixel(props) {
-  const { color, readOnly, setColor } = props;
+  const { color, onChange, stitchType } = props;
 
-  // TODO: Make this work for click and drag
-  function onChange() {
-    if (readOnly) {
-      return;
-    }
-
-    setColor(color === DARK ? LIGHT : DARK); // toggle
-  }
+  const dotColor = color === "#ffffff" ? "#ccc" : "#fff";
 
   return (
     <div
       style={{ backgroundColor: color, border: "1px solid #D3D3D3" }}
       className="pixel"
       onClick={onChange}
-    />
+    >
+      {stitchType === RAISED && (
+        <span style={{ backgroundColor: dotColor }} className="dot" />
+      )}
+    </div>
   );
 }

@@ -11,8 +11,6 @@ html {
 }
 
 body {
-  background: $black;
-  color: $white;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -21,17 +19,17 @@ body {
   min-width: fit-content;
 }
 
-#drawingPanel {
+.drawingPanel {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-#pixels {
+.pixels {
   margin-bottom: 2rem;
 }
 
-#editor {
+.editor {
   border: 1px solid $red;
   border-radius: 0.25rem;
   padding: 1rem 4rem 2rem 4rem;
@@ -123,6 +121,13 @@ code {
   &:hover {
     cursor: pointer;
   }
+}
+
+.dot {
+  height: 5px;
+  width: 5px;
+  border-radius: 50%;
+  display: inline-block;
 }
 
 .row {
