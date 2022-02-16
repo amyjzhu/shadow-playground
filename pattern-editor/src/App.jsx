@@ -123,7 +123,7 @@ export default function App() {
         color={selectedColor}
         onChangeComplete={(color) => setSelectedColor(color.hex)}
       />
-      <div style={{ display: "flex" }} className="App">
+      <div style={{ display: "flex", marginTop: 10 }} className="App">
         <DrawingPanel
           style={{ float: "left" }}
           colorMap={colorMap}
@@ -132,7 +132,17 @@ export default function App() {
           title={"Editor"}
         />
         <div id="viewer">
-          <Viewer style={{ float: "right" }} rows={stitchMap} colours={colorMap} />
+          <Viewer
+            style={{
+              margin: 0,
+              height: "50vh",
+              width: "40vw",
+              overflow: "scroll",
+              float: "right",
+            }}
+            rows={stitchMap}
+            colours={colorMap}
+          />
         </div>
       </div>
     </div>
