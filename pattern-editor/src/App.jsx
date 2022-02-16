@@ -11,6 +11,7 @@ import { HEIGHT, WIDTH, RAISED, FLAT } from "./constants";
 import "./styles/App.scss";
 import DrawingPanel from "./DrawingPanel";
 import Viewer from "./Viewer";
+import Text from "./Text";
 
 export default function App() {
   let defaultColorMap = [];
@@ -83,6 +84,16 @@ export default function App() {
     resize(newWidth, height);
   }
 
+  function handleLoadStitchPattern(newMap) {
+    let newStitchMap = [...newMap];
+    setStitchMap(newStitchMap);
+  }
+
+  function handleLoadColorPattern(newMap) {
+    let newColorMap = [...newMap];
+    setColorMap(newColorMap);
+  }
+
   // TODO: Might be nice to show some instructions about what this means?
   return (
     <div>
@@ -145,6 +156,12 @@ export default function App() {
           />
         </div>
       </div>
+      <Text 
+          rows={stitchMap}
+          colours={colorMap}
+          handleLoadStitchPattern={handleLoadStitchPattern}
+          handleLoadColorPattern={handleLoadColorPattern}
+        />
     </div>
   );
 }
