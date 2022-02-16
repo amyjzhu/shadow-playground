@@ -91,6 +91,36 @@ export default class Viewer extends Component {
         window.addEventListener('resize', resize);
         resize();
 
+        function View( canvas, position ) {
+
+			canvas.width = canvas.clientWidth * window.devicePixelRatio;
+			canvas.height = canvas.clientHeight * window.devicePixelRatio;
+            console.log(canvas.width + " x " + canvas.height);
+            console.log(canvas);
+
+			// const context = canvas.getContext( '2d' );
+            // canvas.appendChild( renderer.domElement );
+
+
+			const camera = new THREE.PerspectiveCamera( 20, canvas.clientWidth / canvas.clientHeight, 1, 20000 );
+            camera.position.set(100, 50, 40);
+            camera.lookAt(position);
+
+
+			this.render = function () {
+				// renderer.render( scene, camera );
+				// context.drawImage( renderer.domElement, 0, 0 );
+
+			};
+
+		}
+        
+        this.views = [];
+        this.views.push(new View(this.eastView, new THREE.Vector3(0.0, 0.0, 0.0)));
+        this.views.push(new View(this.westView, new THREE.Vector3(0.0, 0.0, 0.0)));
+        this.views.push(new View(this.northView, new THREE.Vector3(0.0, 0.0, 0.0)));
+        this.views.push(new View(this.southView, new THREE.Vector3(0.0, 0.0, 0.0)));
+
         // //SCROLLBAR FUNCTION DISABLE
         // window.onscroll = function () {
         //     window.scrollTo(0, 0);
@@ -551,6 +581,8 @@ void main() {
             // checkKeyboard();
             requestAnimationFrame(update);
             renderer.render(scene, camera);
+            // console.log(that.views);
+            that.views.forEach(v => v.render());
         }
 
         function from01Bitmap(bitmap) {
@@ -694,6 +726,11 @@ void main() {
           <div className="editor">
             <h1>Visualizer</h1>
             <div ref={(ref) => (this.mount = ref)} />
+            <br></br>
+            <div ref={(ref) => (this.eastView = ref)} />
+            <div ref={(ref) => (this.westView = ref)} />
+            <div ref={(ref) => (this.northView = ref)} />
+            <div ref={(ref) => (this.southView = ref)} />
           </div>
         )
       }
