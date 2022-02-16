@@ -308,43 +308,6 @@ export default class Viewer extends Component {
             return geom;
         }
 
-        let generateSideTextureMap = (raisedFlatBitmap) => {
-            // we want a map that says "right" or "left" side
-            let size = (that.height + 1) * (that.width + 1);
-            // const data = new Uint8Array(size);
-            let data = [...Array(size)].map(x => -1.0);
-            console.log(data);
-
-            let top = 0.25;
-            let left = 0;
-            let right = 1.0;
-            // lol ignore for now 
-            let bottom = 0.75;
-
-            for (let i = 0; i < raisedFlatBitmap.length; i++) {
-                let row = raisedFlatBitmap[i];
-                for (let j = 0; j < row.length; j++) {
-                    if (row[j]) {
-                        let index = i * (that.width + 1) + j; 
-                        let next_row = (i + 1) * (that.width + 1) + j;
-                        data[index] = left; 
-                        data[index + 1] = right;
-                        // data[next_row] = top;
-                    }
-                }
-            }
-
-            // const texture = new THREE.DataTexture(data, that.width + 1, that.height + 1, THREE.AlphaFormat, THREE.UnsignedByteType);
-            
-            // texture.wrapS = THREE.ClampToEdgeWrapping;
-            // texture.wrapT = THREE.ClampToEdgeWrapping;
-
-            // console.log(raisedFlatBitmap);
-            console.log(data); 
-            // return texture;
-            return data;
-        }
-
         // UNIFORMS
         var knitPosition = { type: 'v3', value: new THREE.Vector3(0.0, 0.0, 0.0) };
         var lightSource = { type: 'v3', value: new THREE.Vector3(0.0, 20.0, 1.0) };
@@ -380,7 +343,6 @@ export default class Viewer extends Component {
 
         console.log(bitmap);
         let geom = generateRaisedMesh(bitmap);
-        let sideTextureMap = generateSideTextureMap(bitmap);
 
 
         // MATERIALS: specifying uniforms and shaders
@@ -389,7 +351,6 @@ export default class Viewer extends Component {
                 knitPosition: knitPosition,
                 lightSource: lightSource,
                 colourMap: { type: "t", value: colourMap },
-                sideTextureMap: { type: "fv", value: sideTextureMap },
 
                 lightColor: lightColorUniform,
                 lightDirection: lightDirectionUniform,
@@ -500,16 +461,17 @@ void main() {
             texUv = vec2(position.x, position.z);
             //vUv = uv;
             
+            float decrease = 0.001;
             // if (dot(normal, vec3(0.0, 1.0, 0.0)) == 0.0) {
             if (normalize(normal) == vec3(0.0, 0.0, 1.0)) {
                 side = 1.0;
-                vUv = vec2(position.x / xRange, position.z / zRange - 0.0001);
+                vUv = vec2(position.x / xRange, (position.z - 0.5) / zRange);
             } else if (normalize(normal) == vec3(0.0, 0.0, -1.0)) {
-                vUv = vec2(position.x / xRange, position.z / zRange + 0.0001);
+                vUv = vec2(position.x / xRange, (position.z + 0.5) / zRange);
             } else if (normalize(normal) == vec3(1.0, 0.0, 0.0)) {
-                vUv = vec2(position.x / xRange - 0.0001, position.z / zRange);
+                vUv = vec2((position.x - 0.5) / xRange, position.z / zRange);
             } else if (normalize(normal) == vec3(-1.0, 0.0, 0.0)) {
-                vUv = vec2(position.x / xRange + 0.0001, position.z / zRange);
+                vUv = vec2((position.x + 0.5) / xRange, position.z / zRange);
             }
             
             colour = position;
@@ -521,7 +483,8 @@ void main() {
             // console.log(shaders);
             // knitMaterial.vertexShader = shaders['glsl/vertex.glsl'];
             // knitMaterial.fragmentShader = shaders['glsl/fragment.glsl'];
-            knitMaterial.vertexShader = '#define ARRAYMAX '+ sideTextureMap.length +'\n' + vertShader;
+            // knitMaterial.vertexShader = '#define ARRAYMAX '+ sideTextureMap.length +'\n' + vertShader;
+            knitMaterial.vertexShader = vertShader;
             console.log(knitMaterial.vertexShader);
             knitMaterial.fragmentShader = fragShader;
             knitMaterial.glslVersion = THREE.GLSL3;
@@ -550,9 +513,6 @@ void main() {
             this.replaceMesh = (newBitmap) => {
                 console.log(cube);
                 cube.geometry = generateRaisedMesh(newBitmap);
-                let sideTextureMap = generateSideTextureMap(newBitmap);
-                cube.material.uniforms.sideTextureMap.value = sideTextureMap;
-                cube.material.vertexShader = '#define ARRAYMAX '+ sideTextureMap.length +'\n' + vertShader;
                 cube.needsUpdate = true;
             }
     
