@@ -14,7 +14,10 @@ export default function DrawingPanel(props) {
   }
 
   return (
-    <div className="editor">
+    <div
+      style={{ height: "50vh", width: "40vw", overflow: "scroll" }}
+      className="editor"
+    >
       <h2>{title}</h2>
       <div className="drawingPanel">
         <div className="pixels">
