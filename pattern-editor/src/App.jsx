@@ -10,7 +10,7 @@ import FormLabel from "@mui/material/FormLabel";
 import { HEIGHT, WIDTH, RAISED, FLAT } from "./constants";
 import "./styles/App.scss";
 import DrawingPanel from "./DrawingPanel";
-import Viewer from "./Viewer";
+import ViewerGroup from "./ViewerGroup";
 import Text from "./Text";
 
 export default function App() {
@@ -142,17 +142,17 @@ export default function App() {
           updatePixel={updatePixel}
           title={"Editor"}
         />
-        <div id="viewer">
-          <Viewer
+        <div id="all-viewers">
+          < ViewerGroup 
             style={{
-              margin: 0,
-              height: "50vh",
-              width: "40vw",
-              overflow: "scroll",
-              float: "right",
+            margin: 0,
+            height: "50vh",
+            width: "40vw",
+            overflow: "scroll",
+            float: "right",
             }}
-            rows={stitchMap}
-            colours={colorMap}
+            stitchMap={stitchMap}
+            colorMap={colorMap}
           />
         </div>
       </div>

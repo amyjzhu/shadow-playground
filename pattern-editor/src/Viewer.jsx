@@ -4,6 +4,7 @@ import OrbitControls from 'three-orbitcontrols'
 // hopefully we can just use the three that's in the src/js/
 export default class Viewer extends Component {
     rows = this.props.rows;
+
     componentDidUpdate(prevProps, prevState) {
         if (prevProps.rows !== this.props.rows) {
                console.log('something prop has changed.');
@@ -17,6 +18,8 @@ export default class Viewer extends Component {
                console.log(newBitmap);
             //    let colourBitmap = [...Array(this.height).keys()].map(x => (x % 2 == 0) ? [...Array(this.width)].map(f => true) : [...Array(this.width)].map(f => false));
             //    this.replaceStripedTexture(colourBitmap);
+            // set the place to look 
+               this.camera.lookAt(this.width * this.stitch_width / 2, 0, this.height * this.stitch_height / 2);
         }
 
         if (prevProps.colours !== this.props.colours) {
@@ -65,25 +68,32 @@ export default class Viewer extends Component {
 
         // SETUP CAMERA
         var camera = new THREE.PerspectiveCamera(30, 1, 0.1, 1000); // view angle, aspect ratio, near, far
-        camera.position.set(100, 50, 40);
+        // camera.position.set(100, 50, 40);
+        this.cameraPosn = this.props.cameraPosn || [100, 50, 40];
+        camera.position.set(this.cameraPosn[0], this.cameraPosn[1], this.cameraPosn[2]);
+        // TODO: make item centred. 
         camera.lookAt(scene.position);
         scene.add(camera);
+        this.camera = camera;
 
         // SETUP ORBIT CONTROLS OF THE CAMERA
         // TODO: restrict to linear-ish view (no upside down)
-        var controls = new OrbitControls(camera, renderer.domElement);
-        // var controls = new THREE.OrbitControls(camera);
-        controls.damping = 0.2;
-        controls.autoRotate = false;
+        if (this.props.allowControls) {
+            var controls = new OrbitControls(camera, renderer.domElement);
+            // var controls = new THREE.OrbitControls(camera);
+            controls.damping = 0.2;
+            controls.autoRotate = false;
 
-        console.log(controls)
+            console.log(controls)
+        }
 
         // ADAPT TO WINDOW RESIZE
         function resize() {
             // renderer.setSize(container.offsetWidth, container.offsetHeight);
             // camera.aspect = container.offsetWidth / container.offsetHeight;
-            renderer.setSize( window.innerWidth / 2, window.innerHeight/2);
-            camera.aspect =  (window.innerWidth /2) / (window.innerHeight /2);
+            // renderer.setSize( window.innerWidth / 2, window.innerHeight/2);
+            renderer.setSize( window.innerWidth / 4, window.innerHeight/4);
+            camera.aspect =  (window.innerWidth /4) / (window.innerHeight /4);
             camera.updateProjectionMatrix();
         }
 
@@ -532,16 +542,30 @@ void main() {
                 cube.needsUpdate = true;
             }
 
-            this.width = 32;
-            this.height = 29;
-            
-            let newBitmap = getStar();
+            let do_star = false;
+            this.width = 10;
+            this.height = 10;
+            let newBitmap = [...Array(this.height)].map(x => [...Array(this.width)].map(r => false));
             // newBitmap[5][8] = true;
             this.replaceMesh(newBitmap);
-            let newColourTexture = getStarColour();
-            // generateColouredTexture(newColourTexture);
+            let newColourTexture = [...Array(this.height)].map(x => [...Array(this.width)].map(r => "fff"));
             this.replaceColourTexture(newColourTexture);
+            this.camera.lookAt(this.width * this.stitch_width / 2, 0, this.height * this.stitch_height / 2);
             update();
+
+            if (do_star) {
+                this.width = 32;
+                this.height = 29;
+                
+                let newBitmap = getStar();
+                // newBitmap[5][8] = true;
+                this.replaceMesh(newBitmap);
+                let newColourTexture = getStarColour();
+                // generateColouredTexture(newColourTexture);
+                this.replaceColourTexture(newColourTexture);
+                this.camera.lookAt(this.width * this.stitch_width / 2, 0, this.height * this.stitch_height / 2);
+                update();
+            }
             //   
         
 
@@ -692,7 +716,7 @@ void main() {
     render() {
         return (
           <div className="editor">
-            <h1>Visualizer</h1>
+            <h3>{this.props.title}</h3>
             <div ref={(ref) => (this.mount = ref)} />
           </div>
         )
