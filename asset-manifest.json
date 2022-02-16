@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/shadow-playground/static/css/main.f8ecf8d1.css",
-    "main.js": "/shadow-playground/static/js/main.07b100f4.js",
+    "main.css": "/shadow-playground/static/css/main.1a76457c.css",
+    "main.js": "/shadow-playground/static/js/main.07fc74b4.js",
     "index.html": "/shadow-playground/index.html",
-    "main.f8ecf8d1.css.map": "/shadow-playground/static/css/main.f8ecf8d1.css.map",
-    "main.07b100f4.js.map": "/shadow-playground/static/js/main.07b100f4.js.map"
+    "main.1a76457c.css.map": "/shadow-playground/static/css/main.1a76457c.css.map",
+    "main.07fc74b4.js.map": "/shadow-playground/static/js/main.07fc74b4.js.map"
   },
   "entrypoints": [
-    "static/css/main.f8ecf8d1.css",
-    "static/js/main.07b100f4.js"
+    "static/css/main.1a76457c.css",
+    "static/js/main.07fc74b4.js"
   ]
 }
