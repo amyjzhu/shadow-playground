@@ -8,12 +8,13 @@ export default class Viewer extends Component {
         if (prevProps.rows !== this.props.rows) {
                console.log('something prop has changed.');
                console.log(this.props.rows);
-               let newBitmap = this.props.rows
+               let newBitmap = this.props.rows.map(r => r.map(x => x == 0 ? false : true));
                console.log(newBitmap);
                this.height = newBitmap.length;
                this.width = newBitmap[0].length;
                console.log(this.height, this.width);
                this.replaceMesh(newBitmap);
+               console.log(newBitmap);
             //    let colourBitmap = [...Array(this.height).keys()].map(x => (x % 2 == 0) ? [...Array(this.width)].map(f => true) : [...Array(this.width)].map(f => false));
             //    this.replaceStripedTexture(colourBitmap);
         }
@@ -114,8 +115,8 @@ export default class Viewer extends Component {
         scene.add(floor);
         floor.parent = worldFrame;
 
-        let stitch_height = 1;
-        let stitch_width = 1;
+        this.stitch_height = 1;
+        this.stitch_width = 1;
         // this.width = 41;
         // this.height = 41;
         this.width = 29;
@@ -187,8 +188,8 @@ export default class Viewer extends Component {
 
         let raised_y = 0.5;
 
-        let max_y = stitch_height * this.height;
-        let max_x = stitch_width * this.width;
+        let max_y = this.stitch_height * this.height;
+        let max_x = this.stitch_width * this.width;
 
         // generate our own geometry for the box
         // TODO: this is supposed to be deprecated in newest three.js
@@ -201,8 +202,8 @@ export default class Viewer extends Component {
             // start by making a bunch of vertices.
             for (let h = 0; h <= that.height; h++) {
                 for (let w = 0; w <= that.width; w++) {
-                    let z = h * stitch_height;
-                    let x = w * stitch_width;
+                    let z = h * that.stitch_height;
+                    let x = w * that.stitch_width;
                     geom.vertices.push(new THREE.Vector3(x, 0, z));
                     geom.vertices.push(new THREE.Vector3(x, raised_y, z));
                     //   raised_vertices.push(new THREE.Vector3(x, raised_y, z));
@@ -309,29 +310,39 @@ export default class Viewer extends Component {
 
         let generateSideTextureMap = (raisedFlatBitmap) => {
             // we want a map that says "right" or "left" side
-            let size = (that.height) * (that.width + 1);
-            const data = new Uint8Array(size);
+            let size = (that.height + 1) * (that.width + 1);
+            // const data = new Uint8Array(size);
+            let data = [...Array(size)].map(x => -1.0);
+            console.log(data);
 
-            // uint8array is filled with zero by default
-            let left = 1;
-            let right = 2;
+            let top = 0.25;
+            let left = 0;
+            let right = 1.0;
+            // lol ignore for now 
+            let bottom = 0.75;
 
             for (let i = 0; i < raisedFlatBitmap.length; i++) {
                 let row = raisedFlatBitmap[i];
                 for (let j = 0; j < row.length; j++) {
-                    let index = i * (that.width + 1) + j; 
-                    data[index] = left; 
-                    data[index + 1] = right;
+                    if (row[j]) {
+                        let index = i * (that.width + 1) + j; 
+                        let next_row = (i + 1) * (that.width + 1) + j;
+                        data[index] = left; 
+                        data[index + 1] = right;
+                        // data[next_row] = top;
+                    }
                 }
             }
 
-            const texture = new THREE.DataTexture(data, size, size, THREE.LuminanceAlphaFormat, THREE.UnsignedByteType);
+            // const texture = new THREE.DataTexture(data, that.width + 1, that.height + 1, THREE.AlphaFormat, THREE.UnsignedByteType);
             
-            texture.wrapS = THREE.ClampToEdgeWrapping;
-            texture.wrapT = THREE.ClampToEdgeWrapping;
+            // texture.wrapS = THREE.ClampToEdgeWrapping;
+            // texture.wrapT = THREE.ClampToEdgeWrapping;
 
-            console.log(data);
-            return texture;
+            // console.log(raisedFlatBitmap);
+            console.log(data); 
+            // return texture;
+            return data;
         }
 
         // UNIFORMS
@@ -359,22 +370,6 @@ export default class Viewer extends Component {
         let colourBitmap = [...Array(this.height).keys()].map(x => (x % 2 == 0) ? [...Array(this.width)].map(f => true) : [...Array(this.width)].map(f => false));
         let colourMap = generateStripedTexture(colourBitmap);
 
-        // MATERIALS: specifying uniforms and shaders
-        var knitMaterial = new THREE.ShaderMaterial({
-            uniforms: {
-                knitPosition: knitPosition,
-                lightSource: lightSource,
-                colourMap: { type: "t", value: colourMap },
-
-                lightColor: lightColorUniform,
-                lightDirection: lightDirectionUniform,
-                kAmbient: kAmbientUniform,
-                kDiffuse: kDiffuseUniform,
-                xRange: xRangeUniform,
-                zRange: zRangeUniform,
-            },
-        });
-
 
         let bitmap = [...Array(this.height)].map(x => [...Array(this.width)].map(f => false));
         bitmap[10][5] = true;
@@ -385,6 +380,28 @@ export default class Viewer extends Component {
 
         console.log(bitmap);
         let geom = generateRaisedMesh(bitmap);
+        let sideTextureMap = generateSideTextureMap(bitmap);
+
+
+        // MATERIALS: specifying uniforms and shaders
+        var knitMaterial = new THREE.ShaderMaterial({
+            uniforms: {
+                knitPosition: knitPosition,
+                lightSource: lightSource,
+                colourMap: { type: "t", value: colourMap },
+                sideTextureMap: { type: "fv", value: sideTextureMap },
+
+                lightColor: lightColorUniform,
+                lightDirection: lightDirectionUniform,
+                kAmbient: kAmbientUniform,
+                kDiffuse: kDiffuseUniform,
+                xRange: xRangeUniform,
+                zRange: zRangeUniform,
+            },
+        });
+
+        console.log(knitMaterial.uniforms);
+
 
 
         // let fragShader = `#version 300 es
@@ -398,6 +415,7 @@ in vec3 interpolatedNormal;
 in vec3 lightDirection;
 in vec3 colour;
 in vec2 vUv;
+in vec2 texUv;
 in float z;
 uniform sampler2D colourMap;
 
@@ -412,6 +430,7 @@ in vec3 cameraPos;
 void main() {
 
     vec3 mainColor = texture(colourMap, vUv).rgb;
+
 
 	vec3 lightDir = normalize(lightDirection);
 	vec3 normal = normalize(normalizedNormal);
@@ -441,15 +460,15 @@ void main() {
         uniform float xRange;
         uniform float zRange;
         
-        // HINT: YOU WILL NEED AN ADDITIONAL UNIFORM VARIABLE TO MAKE THE BUNNY HOP
-        
         // Create shared variable for the vertex and fragment shaders
         
         out vec2 vUv;
+        out vec2 texUv;
         out vec3 interpolatedNormal;
         out vec3 lightDirection;
         out vec3 colour;
         out float z;
+        out float side;
         
         out vec3 normalizedNormal;
         out vec3 cameraPos;
@@ -476,7 +495,23 @@ void main() {
             // roll your own uv coords, pretty simple: http://paulyg.f2s.com/uv.htm
             // vUv = vec2((position.x + 0.5) / xRange, (position.z + 0.5) / zRange);
             vUv = vec2(position.x / xRange, position.z / zRange);
+            // texUv = vec2(floor(position.x), floor((position.z)));
+            // texUv = vec2(floor(position.x / (xRange + 1.0)), floor((position.z / (zRange + 1.0))));
+            texUv = vec2(position.x, position.z);
             //vUv = uv;
+            
+            // if (dot(normal, vec3(0.0, 1.0, 0.0)) == 0.0) {
+            if (normalize(normal) == vec3(0.0, 0.0, 1.0)) {
+                side = 1.0;
+                vUv = vec2(position.x / xRange, position.z / zRange - 0.0001);
+            } else if (normalize(normal) == vec3(0.0, 0.0, -1.0)) {
+                vUv = vec2(position.x / xRange, position.z / zRange + 0.0001);
+            } else if (normalize(normal) == vec3(1.0, 0.0, 0.0)) {
+                vUv = vec2(position.x / xRange - 0.0001, position.z / zRange);
+            } else if (normalize(normal) == vec3(-1.0, 0.0, 0.0)) {
+                vUv = vec2(position.x / xRange + 0.0001, position.z / zRange);
+            }
+            
             colour = position;
         }
         `;
@@ -486,8 +521,8 @@ void main() {
             // console.log(shaders);
             // knitMaterial.vertexShader = shaders['glsl/vertex.glsl'];
             // knitMaterial.fragmentShader = shaders['glsl/fragment.glsl'];
-            console.log(vertShader);
-            knitMaterial.vertexShader = vertShader;
+            knitMaterial.vertexShader = '#define ARRAYMAX '+ sideTextureMap.length +'\n' + vertShader;
+            console.log(knitMaterial.vertexShader);
             knitMaterial.fragmentShader = fragShader;
             knitMaterial.glslVersion = THREE.GLSL3;
 
@@ -515,22 +550,24 @@ void main() {
             this.replaceMesh = (newBitmap) => {
                 console.log(cube);
                 cube.geometry = generateRaisedMesh(newBitmap);
-                generateSideTextureMap(newBitmap);
+                let sideTextureMap = generateSideTextureMap(newBitmap);
+                cube.material.uniforms.sideTextureMap.value = sideTextureMap;
+                cube.material.vertexShader = '#define ARRAYMAX '+ sideTextureMap.length +'\n' + vertShader;
                 cube.needsUpdate = true;
             }
     
             this.replaceStripedTexture = (newBitmap) => {
                 console.log(cube);
-                cube.material.uniforms.xRange.value = this.width * stitch_width;
-                cube.material.uniforms.zRange.value = this.height * stitch_height;
+                cube.material.uniforms.xRange.value = this.width * this.stitch_width;
+                cube.material.uniforms.zRange.value = this.height * this.stitch_height;
                 cube.material.uniforms.colourMap.value = generateStripedTexture(newBitmap);
                 cube.needsUpdate = true;
             }
 
             this.replaceColourTexture = (newBitmap) => {
                 console.log(cube);
-                cube.material.uniforms.xRange.value = this.width * stitch_width;
-                cube.material.uniforms.zRange.value = this.height * stitch_height;
+                cube.material.uniforms.xRange.value = this.width * this.stitch_width;
+                cube.material.uniforms.zRange.value = this.height * this.stitch_height;
                 cube.material.uniforms.colourMap.value = generateColouredTexture(newBitmap);
                 cube.needsUpdate = true;
             }
@@ -548,7 +585,7 @@ void main() {
             //   
         
 
-        //   const geom = new THREE.BoxGeometry( stitch_width * width, 1, stitch_height * height );
+        //   const geom = new THREE.BoxGeometry( this.stitch_width * width, 1, this.stitch_height * height );
 
         function update() {
             // checkKeyboard();
