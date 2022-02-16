@@ -140,7 +140,8 @@ export default function App() {
               overflow: "scroll",
               float: "right",
             }}
-            rows={colorMap}
+            rows={stitchMap}
+            colours={colorMap}
           />
         </div>
       </div>

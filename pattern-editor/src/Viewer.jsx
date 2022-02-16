@@ -8,17 +8,26 @@ export default class Viewer extends Component {
         if (prevProps.rows !== this.props.rows) {
                console.log('something prop has changed.');
                console.log(this.props.rows);
-               let raised = ["#673ab7", "#8a8a8a"];
-               let newBitmap = this.props.rows.map(r => 
-                r.map(b => raised.includes(b) ? true : false));
+               let newBitmap = this.props.rows
                console.log(newBitmap);
                this.height = newBitmap.length;
                this.width = newBitmap[0].length;
                console.log(this.height, this.width);
                this.replaceMesh(newBitmap);
-               let colourBitmap = [...Array(this.height).keys()].map(x => (x % 2 == 0) ? [...Array(this.width)].map(f => true) : [...Array(this.width)].map(f => false));
-               this.replaceStripedTexture(colourBitmap);
+            //    let colourBitmap = [...Array(this.height).keys()].map(x => (x % 2 == 0) ? [...Array(this.width)].map(f => true) : [...Array(this.width)].map(f => false));
+            //    this.replaceStripedTexture(colourBitmap);
         }
+
+        if (prevProps.colours !== this.props.colours) {
+            console.log('something prop has changed.');
+            console.log(this.props.colours);
+            let raised = ["#673ab7", "#8a8a8a"];
+            let newBitmap = this.props.colours;
+            this.height = newBitmap.length;
+            this.width = newBitmap[0].length;
+            console.log(this.height, this.width);
+            this.replaceColourTexture(newBitmap);
+     }
     }
     
     width = 41;
@@ -81,10 +90,10 @@ export default class Viewer extends Component {
         window.addEventListener('resize', resize);
         resize();
 
-        //SCROLLBAR FUNCTION DISABLE
-        window.onscroll = function () {
-            window.scrollTo(0, 0);
-        }
+        // //SCROLLBAR FUNCTION DISABLE
+        // window.onscroll = function () {
+        //     window.scrollTo(0, 0);
+        // }
 
         // WORLD COORDINATE FRAME: other objects are defined with respect to it
         var worldFrame = new THREE.AxesHelper(5);
@@ -298,6 +307,33 @@ export default class Viewer extends Component {
             return geom;
         }
 
+        let generateSideTextureMap = (raisedFlatBitmap) => {
+            // we want a map that says "right" or "left" side
+            let size = (that.height) * (that.width + 1);
+            const data = new Uint8Array(size);
+
+            // uint8array is filled with zero by default
+            let left = 1;
+            let right = 2;
+
+            for (let i = 0; i < raisedFlatBitmap.length; i++) {
+                let row = raisedFlatBitmap[i];
+                for (let j = 0; j < row.length; j++) {
+                    let index = i * (that.width + 1) + j; 
+                    data[index] = left; 
+                    data[index + 1] = right;
+                }
+            }
+
+            const texture = new THREE.DataTexture(data, size, size, THREE.LuminanceAlphaFormat, THREE.UnsignedByteType);
+            
+            texture.wrapS = THREE.ClampToEdgeWrapping;
+            texture.wrapT = THREE.ClampToEdgeWrapping;
+
+            console.log(data);
+            return texture;
+        }
+
         // UNIFORMS
         var knitPosition = { type: 'v3', value: new THREE.Vector3(0.0, 0.0, 0.0) };
         var lightSource = { type: 'v3', value: new THREE.Vector3(0.0, 20.0, 1.0) };
@@ -479,6 +515,7 @@ void main() {
             this.replaceMesh = (newBitmap) => {
                 console.log(cube);
                 cube.geometry = generateRaisedMesh(newBitmap);
+                generateSideTextureMap(newBitmap);
                 cube.needsUpdate = true;
             }
     
