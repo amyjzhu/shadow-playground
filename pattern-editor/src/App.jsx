@@ -7,7 +7,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
 
-import { HEIGHT, WIDTH, RAISED, FLAT } from "./constants";
+import { HEIGHT, WIDTH, RAISED, FLAT, TOGGLE } from "./constants";
 import "./styles/App.scss";
 import DrawingPanel from "./DrawingPanel";
 import ViewerGroup from "./ViewerGroup";
@@ -61,8 +61,19 @@ export default function App() {
     newColorMap[row][col] = selectedColor;
     setColorMap(newColorMap);
 
+    let newType;
+    if (stitchType === TOGGLE) {
+      if (stitchMap[row][col] === RAISED) {
+        newType = FLAT;
+      } else {
+        newType = RAISED;
+      }
+    } else {
+      newType = stitchType;
+    }
+
     let newStitchMap = [...stitchMap];
-    newStitchMap[row][col] = stitchType;
+    newStitchMap[row][col] = newType;
     setStitchMap(newStitchMap);
   }
 
@@ -124,8 +135,9 @@ export default function App() {
           row
           name="row-radio-buttons-group"
           value={stitchType}
-          onChange={(e) => setStitchType(parseInt(e.target.value))}
+          onChange={(e) => setStitchType(parseInt(e.target.value)) }
         >
+          <FormControlLabel value={TOGGLE} control={<Radio />} label="Toggle" />
           <FormControlLabel value={RAISED} control={<Radio />} label="Raised" />
           <FormControlLabel value={FLAT} control={<Radio />} label="Flat" />
         </RadioGroup>
