@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import _ from "lodash";
 import TextField from "@material-ui/core/TextField";
 import { CompactPicker } from "react-color";
 import Radio from "@mui/material/Radio";
@@ -7,63 +8,60 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
 
-import { HEIGHT, WIDTH, RAISED, FLAT, TOGGLE } from "./constants";
+import {
+  HEIGHT,
+  WIDTH,
+  RAISED,
+  FLAT,
+  TOGGLE,
+  DEFAULT_STITCH,
+} from "./constants";
 import "./styles/App.scss";
 import DrawingPanel from "./DrawingPanel";
 import ViewerGroup from "./ViewerGroup";
 import Text from "./Text";
 
 export default function App() {
+  let defaultPattern = [];
   let defaultColorMap = [];
   let defaultStitchMap = [];
   for (let row = 0; row < HEIGHT; row++) {
-    let colorRow = [];
-    let stitchRow = [];
+    let patternRow = [];
     for (let col = 0; col < WIDTH; col++) {
-      colorRow.push("#fff");
-      stitchRow.push(FLAT);
+      patternRow.push({ ...DEFAULT_STITCH });
     }
-    defaultColorMap.push(colorRow);
-    defaultStitchMap.push(stitchRow);
+    defaultPattern.push(patternRow);
   }
 
   let [selectedColor, setSelectedColor] = useState("#653294");
   let [stitchType, setStitchType] = useState(RAISED);
-  let [colorMap, setColorMap] = useState(defaultColorMap);
-  let [stitchMap, setStitchMap] = useState(defaultStitchMap);
   let [width, setWidth] = useState(WIDTH);
   let [height, setHeight] = useState(HEIGHT);
+  let [pattern, setPattern] = useState(defaultPattern);
 
   function resize(newWidth, newHeight) {
-    let newColorMap = [];
-    let newStitchMap = [];
+    let newPattern = [];
     for (let row = 0; row < newHeight; row++) {
-      let colorRow = [];
-      let stitchRow = [];
+      let patternRow = [];
       for (let col = 0; col < newWidth; col++) {
-        if (colorMap[row] && colorMap[row][col]) {
-          colorRow.push(colorMap[row][col]);
-          stitchRow.push(stitchMap[row][col]);
+        if (pattern[row] && pattern[row][col]) {
+          patternRow.push({ ...pattern[row][col] });
         } else {
-          colorRow.push("#fff");
-          stitchRow.push(FLAT);
+          patternRow.push({ ...DEFAULT_STITCH });
         }
       }
-      newColorMap.push(colorRow);
-      newStitchMap.push(stitchRow);
+      newPattern.push(patternRow);
     }
-    setColorMap(newColorMap);
-    setStitchMap(newStitchMap);
+    setPattern(newPattern);
   }
 
   function updatePixel(row, col) {
-    let newColorMap = [...colorMap];
-    newColorMap[row][col] = selectedColor;
-    setColorMap(newColorMap);
+    let newPattern = _.cloneDeep(pattern);
+    newPattern[row][col].color = selectedColor;
 
     let newType;
     if (stitchType === TOGGLE) {
-      if (stitchMap[row][col] === RAISED) {
+      if (pattern[row][col].stitch === RAISED) {
         newType = FLAT;
       } else {
         newType = RAISED;
@@ -72,9 +70,8 @@ export default function App() {
       newType = stitchType;
     }
 
-    let newStitchMap = [...stitchMap];
-    newStitchMap[row][col] = newType;
-    setStitchMap(newStitchMap);
+    newPattern[row][col].stitch = newType;
+    setPattern(newPattern);
   }
 
   function handleChangeHeight(e) {
@@ -95,14 +92,8 @@ export default function App() {
     resize(newWidth, height);
   }
 
-  function handleLoadStitchPattern(newMap) {
-    let newStitchMap = [...newMap];
-    setStitchMap(newStitchMap);
-  }
-
-  function handleLoadColorPattern(newMap) {
-    let newColorMap = [...newMap];
-    setColorMap(newColorMap);
+  function handleLoadPattern(newPattern) {
+    setPattern(newPattern);
   }
 
   // TODO: Might be nice to show some instructions about what this means?
@@ -149,8 +140,7 @@ export default function App() {
       <div style={{ display: "flex", marginTop: 10 }} className="App">
         <DrawingPanel
           style={{ float: "left" }}
-          colorMap={colorMap}
-          stitchMap={stitchMap}
+          pattern={pattern}
           updatePixel={updatePixel}
           title={"Editor"}
         />
@@ -163,17 +153,11 @@ export default function App() {
               overflow: "scroll",
               float: "right",
             }}
-            stitchMap={stitchMap}
-            colorMap={colorMap}
+            pattern={pattern}
           />
         </div>
       </div>
-      <Text
-        rows={stitchMap}
-        colours={colorMap}
-        handleLoadStitchPattern={handleLoadStitchPattern}
-        handleLoadColorPattern={handleLoadColorPattern}
-      />
+      <Text pattern={pattern} handleLoadPattern={handleLoadPattern} />
     </div>
   );
 }

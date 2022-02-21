@@ -1,7 +1,7 @@
 import Viewer from "./Viewer";
 
 export default function ViewerGroup(props) {
-  const { colorMap, stitchMap } = props;
+  const { pattern } = props;
 
   return (
     <div>
@@ -14,8 +14,7 @@ export default function ViewerGroup(props) {
               overflow: "scroll",
               float: "right",
             }}
-            rows={stitchMap}
-            colours={colorMap}
+            pattern={pattern}
             allowControls={true}
           />
         </div> */}
@@ -29,8 +28,7 @@ export default function ViewerGroup(props) {
               overflow: "scroll",
               // float: "right",
             }}
-            rows={stitchMap}
-            colours={colorMap}
+            pattern={pattern}
             allowControls={true}
             cameraPosn={[0, 20, 20]}
             title="West"
@@ -45,8 +43,7 @@ export default function ViewerGroup(props) {
               overflow: "scroll",
               float: "right",
             }}
-            rows={stitchMap}
-            colours={colorMap}
+            pattern={pattern}
             allowControls={true}
             //   todo: should really be related to width/height
             cameraPosn={[0, 20, -20]}
@@ -64,8 +61,7 @@ export default function ViewerGroup(props) {
               overflow: "scroll",
               // float: "right",
             }}
-            rows={stitchMap}
-            colours={colorMap}
+            pattern={pattern}
             allowControls={true}
             cameraPosn={[30, 20, 0]}
             title="North"
@@ -80,8 +76,7 @@ export default function ViewerGroup(props) {
               overflow: "scroll",
               float: "right",
             }}
-            rows={stitchMap}
-            colours={colorMap}
+            pattern={pattern}
             allowControls={true}
             cameraPosn={[-30, 20, 0]}
             title="South"

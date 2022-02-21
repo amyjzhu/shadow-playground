@@ -3,13 +3,14 @@ import * as THREE from "three";
 import OrbitControls from "three-orbitcontrols";
 // hopefully we can just use the three that's in the src/js/
 export default class Viewer extends Component {
-  rows = this.props.rows;
-
   componentDidUpdate(prevProps, prevState) {
-    if (prevProps.rows !== this.props.rows) {
+    if (prevProps.pattern !== this.props.pattern) {
       console.log("something prop has changed.");
-      console.log(this.props.rows);
-      let newBitmap = this.props.rows.map((r) =>
+      console.log(this.props.pattern);
+      const stitches = this.props.pattern.map((row) =>
+        row.map((stitch) => stitch.stitch)
+      );
+      let newBitmap = stitches.map((r) =>
         r.map((x) => (x == 0 ? false : true))
       );
       console.log(newBitmap);
@@ -28,11 +29,13 @@ export default class Viewer extends Component {
       );
     }
 
-    if (prevProps.colours !== this.props.colours) {
+    if (prevProps.pattern !== this.props.pattern) {
       console.log("something prop has changed.");
-      console.log(this.props.colours);
+      console.log(this.props.pattern);
       let raised = ["#673ab7", "#8a8a8a"];
-      let newBitmap = this.props.colours;
+      let newBitmap = this.props.pattern.map((row) =>
+        row.map((stitch) => stitch.color)
+      );
       this.height = newBitmap.length;
       this.width = newBitmap[0].length;
       console.log(this.height, this.width);
