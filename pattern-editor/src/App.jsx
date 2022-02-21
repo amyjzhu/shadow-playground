@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import _ from "lodash";
+import { useHotkeys } from "react-hotkeys-hook";
 import TextField from "@material-ui/core/TextField";
 import { CompactPicker } from "react-color";
 import Radio from "@mui/material/Radio";
@@ -38,6 +39,8 @@ export default function App() {
   let [width, setWidth] = useState(WIDTH);
   let [height, setHeight] = useState(HEIGHT);
   let [patternStack, setPatternStack] = useState([defaultPattern]);
+
+  useHotkeys("cmd+z", handleUndo, {}, [patternStack]);
 
   function getPattern() {
     return patternStack[0];
@@ -203,18 +206,20 @@ export default function App() {
           updateCol={updateCol}
           title={"Editor"}
         />
-        <div id="all-viewers">
-          <ViewerGroup
-            style={{
-              margin: 0,
-              height: "50vh",
-              width: "40vw",
-              overflow: "scroll",
-              float: "right",
-            }}
-            pattern={getPattern()}
-          />
-        </div>
+        {false && (
+          <div id="all-viewers">
+            <ViewerGroup
+              style={{
+                margin: 0,
+                height: "50vh",
+                width: "40vw",
+                overflow: "scroll",
+                float: "right",
+              }}
+              pattern={getPattern()}
+            />
+          </div>
+        )}
       </div>
       <Text pattern={getPattern()} handleLoadPattern={handleLoadPattern} />
     </div>

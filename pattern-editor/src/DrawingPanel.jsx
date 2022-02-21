@@ -4,7 +4,6 @@ import { FLAT } from "./constants";
 
 export default function DrawingPanel(props) {
   const { pattern, title, updatePixel, updateRow, updateCol } = props;
-  console.log(pattern);
   let [isMouseDown, setMouseDown] = useState(false);
 
   return (
