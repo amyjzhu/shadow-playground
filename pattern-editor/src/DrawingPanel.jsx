@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import Pixel from "./Pixel";
 import { FLAT } from "./constants";
 
 export default function DrawingPanel(props) {
   const { colorMap, stitchMap, title, updatePixel } = props;
+  let [isMouseDown, setMouseDown] = useState(false);
 
   function updateRow(i) {
     stitchMap[i].forEach((_, j) => updatePixel(i, j));
@@ -17,6 +18,8 @@ export default function DrawingPanel(props) {
     <div
       style={{ height: "50vh", width: "40vw", overflow: "scroll" }}
       className="editor"
+      onMouseDown={() => setMouseDown(true)}
+      onMouseUp={() => setMouseDown(false)}
     >
       <h2>{title}</h2>
       <div className="drawingPanel">
@@ -51,9 +54,8 @@ export default function DrawingPanel(props) {
                   color={colorMap[i][j]}
                   stitchType={stitchMap[i][j]}
                   key={j}
-                  onChange={() => {
-                    updatePixel(i, j);
-                  }}
+                  onChange={() => updatePixel(i, j)}
+                  isMouseDown={isMouseDown}
                 />
               ))}
             </div>

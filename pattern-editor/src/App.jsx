@@ -135,7 +135,7 @@ export default function App() {
           row
           name="row-radio-buttons-group"
           value={stitchType}
-          onChange={(e) => setStitchType(parseInt(e.target.value)) }
+          onChange={(e) => setStitchType(parseInt(e.target.value))}
         >
           <FormControlLabel value={TOGGLE} control={<Radio />} label="Toggle" />
           <FormControlLabel value={RAISED} control={<Radio />} label="Raised" />
@@ -155,25 +155,25 @@ export default function App() {
           title={"Editor"}
         />
         <div id="all-viewers">
-          < ViewerGroup 
+          <ViewerGroup
             style={{
-            margin: 0,
-            height: "50vh",
-            width: "40vw",
-            overflow: "scroll",
-            float: "right",
+              margin: 0,
+              height: "50vh",
+              width: "40vw",
+              overflow: "scroll",
+              float: "right",
             }}
             stitchMap={stitchMap}
             colorMap={colorMap}
           />
         </div>
       </div>
-      <Text 
-          rows={stitchMap}
-          colours={colorMap}
-          handleLoadStitchPattern={handleLoadStitchPattern}
-          handleLoadColorPattern={handleLoadColorPattern}
-        />
+      <Text
+        rows={stitchMap}
+        colours={colorMap}
+        handleLoadStitchPattern={handleLoadStitchPattern}
+        handleLoadColorPattern={handleLoadColorPattern}
+      />
     </div>
   );
 }
