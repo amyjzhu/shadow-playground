@@ -37,31 +37,52 @@ export default function App() {
   let [stitchType, setStitchType] = useState(RAISED);
   let [width, setWidth] = useState(WIDTH);
   let [height, setHeight] = useState(HEIGHT);
-  let [pattern, setPattern] = useState(defaultPattern);
+  let [patternStack, setPatternStack] = useState([defaultPattern]);
+
+  function getPattern() {
+    return patternStack[0];
+  }
+
+  function pushPattern(pattern) {
+    let copy = _.cloneDeep(patternStack);
+    copy.unshift(pattern);
+    setPatternStack(copy);
+  }
+
+  function handleUndo() {
+    let copy = _.cloneDeep(patternStack);
+    copy.shift();
+    if (copy.length > 0) {
+      setPatternStack(copy);
+    } else {
+      setPatternStack([defaultPattern]);
+    }
+  }
 
   function resize(newWidth, newHeight) {
     let newPattern = [];
+    let oldPattern = getPattern();
     for (let row = 0; row < newHeight; row++) {
       let patternRow = [];
       for (let col = 0; col < newWidth; col++) {
-        if (pattern[row] && pattern[row][col]) {
-          patternRow.push({ ...pattern[row][col] });
+        if (oldPattern[row] && oldPattern[row][col]) {
+          patternRow.push({ ...oldPattern[row][col] });
         } else {
           patternRow.push({ ...DEFAULT_STITCH });
         }
       }
       newPattern.push(patternRow);
     }
-    setPattern(newPattern);
+    pushPattern(newPattern);
   }
 
   function updatePixel(row, col) {
-    let newPattern = _.cloneDeep(pattern);
+    let newPattern = _.cloneDeep(getPattern());
     newPattern[row][col].color = selectedColor;
 
     let newType;
     if (stitchType === TOGGLE) {
-      if (pattern[row][col].type === RAISED) {
+      if (getPattern()[row][col].type === RAISED) {
         newType = FLAT;
       } else {
         newType = RAISED;
@@ -71,11 +92,11 @@ export default function App() {
     }
 
     newPattern[row][col].type = newType;
-    setPattern(newPattern);
+    pushPattern(newPattern);
   }
 
   function updateRow(i) {
-    let newPattern = _.cloneDeep(pattern);
+    let newPattern = _.cloneDeep(getPattern());
 
     newPattern[i].forEach((stitch) => {
       stitch.color = selectedColor;
@@ -86,11 +107,11 @@ export default function App() {
             : RAISED
           : stitchType;
     });
-    setPattern(newPattern);
+    pushPattern(newPattern);
   }
 
   function updateCol(i) {
-    let newPattern = _.cloneDeep(pattern);
+    let newPattern = _.cloneDeep(getPattern());
 
     newPattern.forEach((row) => {
       const stitch = row[i];
@@ -102,7 +123,7 @@ export default function App() {
             : RAISED
           : stitchType;
     });
-    setPattern(newPattern);
+    pushPattern(newPattern);
   }
 
   function handleChangeHeight(e) {
@@ -124,7 +145,7 @@ export default function App() {
   }
 
   function handleLoadPattern(newPattern) {
-    setPattern(newPattern);
+    pushPattern(newPattern);
   }
 
   // TODO: Might be nice to show some instructions about what this means?
@@ -168,10 +189,15 @@ export default function App() {
         color={selectedColor}
         onChangeComplete={(color) => setSelectedColor(color.hex)}
       />
+      <div>
+        <button type="button" onClick={handleUndo}>
+          Undo
+        </button>
+      </div>
       <div style={{ display: "flex", marginTop: 10 }} className="App">
         <DrawingPanel
           style={{ float: "left" }}
-          pattern={pattern}
+          pattern={getPattern()}
           updatePixel={updatePixel}
           updateRow={updateRow}
           updateCol={updateCol}
@@ -186,11 +212,11 @@ export default function App() {
               overflow: "scroll",
               float: "right",
             }}
-            pattern={pattern}
+            pattern={getPattern()}
           />
         </div>
       </div>
-      <Text pattern={pattern} handleLoadPattern={handleLoadPattern} />
+      <Text pattern={getPattern()} handleLoadPattern={handleLoadPattern} />
     </div>
   );
 }
