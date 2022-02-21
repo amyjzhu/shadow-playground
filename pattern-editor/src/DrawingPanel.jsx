@@ -38,6 +38,7 @@ export default function DrawingPanel(props) {
                 stitchType={FLAT}
                 key={j}
                 onChange={() => updateCol(j)}
+                isMouseDown={isMouseDown}
               />
             ))}
           </div>
@@ -48,6 +49,7 @@ export default function DrawingPanel(props) {
                 color={"#ccc"}
                 stitchType={FLAT}
                 onChange={() => updateRow(i)}
+                isMouseDown={isMouseDown}
               />
               {row.map((pixel, j) => (
                 <Pixel
