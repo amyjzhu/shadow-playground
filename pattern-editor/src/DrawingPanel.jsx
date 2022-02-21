@@ -47,7 +47,7 @@ export default function DrawingPanel(props) {
               {row.map((pixel, j) => (
                 <Pixel
                   color={pattern[i][j].color}
-                  stitchType={pattern[i][j].stitch}
+                  stitchType={pattern[i][j].type}
                   key={j}
                   onChange={() => updatePixel(i, j)}
                   isMouseDown={isMouseDown}

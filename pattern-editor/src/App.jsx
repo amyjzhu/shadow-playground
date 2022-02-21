@@ -61,7 +61,7 @@ export default function App() {
 
     let newType;
     if (stitchType === TOGGLE) {
-      if (pattern[row][col].stitch === RAISED) {
+      if (pattern[row][col].type === RAISED) {
         newType = FLAT;
       } else {
         newType = RAISED;
@@ -70,7 +70,7 @@ export default function App() {
       newType = stitchType;
     }
 
-    newPattern[row][col].stitch = newType;
+    newPattern[row][col].type = newType;
     setPattern(newPattern);
   }
 
@@ -79,9 +79,9 @@ export default function App() {
 
     newPattern[i].forEach((stitch) => {
       stitch.color = selectedColor;
-      stitch.stitch =
+      stitch.type =
         stitchType === TOGGLE
-          ? stitch.stitch === RAISED
+          ? stitch.type === RAISED
             ? FLAT
             : RAISED
           : stitchType;
@@ -95,9 +95,9 @@ export default function App() {
     newPattern.forEach((row) => {
       const stitch = row[i];
       stitch.color = selectedColor;
-      stitch.stitch =
+      stitch.type =
         stitchType === TOGGLE
-          ? stitch.stitch === RAISED
+          ? stitch.type === RAISED
             ? FLAT
             : RAISED
           : stitchType;

@@ -8,7 +8,7 @@ export default class Viewer extends Component {
       console.log("something prop has changed.");
       console.log(this.props.pattern);
       const stitches = this.props.pattern.map((row) =>
-        row.map((stitch) => stitch.stitch)
+        row.map((stitch) => stitch.type)
       );
       let newBitmap = stitches.map((r) =>
         r.map((x) => (x == 0 ? false : true))
