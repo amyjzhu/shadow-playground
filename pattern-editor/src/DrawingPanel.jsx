@@ -3,17 +3,9 @@ import Pixel from "./Pixel";
 import { FLAT } from "./constants";
 
 export default function DrawingPanel(props) {
-  const { pattern, title, updatePixel } = props;
+  const { pattern, title, updatePixel, updateRow, updateCol } = props;
   console.log(pattern);
   let [isMouseDown, setMouseDown] = useState(false);
-
-  function updateRow(i) {
-    pattern[i].forEach((_, j) => updatePixel(i, j));
-  }
-
-  function updateCol(j) {
-    pattern.forEach((_, i) => updatePixel(i, j));
-  }
 
   return (
     <div

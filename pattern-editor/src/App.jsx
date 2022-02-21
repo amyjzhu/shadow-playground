@@ -74,6 +74,37 @@ export default function App() {
     setPattern(newPattern);
   }
 
+  function updateRow(i) {
+    let newPattern = _.cloneDeep(pattern);
+
+    newPattern[i].forEach((stitch) => {
+      stitch.color = selectedColor;
+      stitch.stitch =
+        stitchType === TOGGLE
+          ? stitch.stitch === RAISED
+            ? FLAT
+            : RAISED
+          : stitchType;
+    });
+    setPattern(newPattern);
+  }
+
+  function updateCol(i) {
+    let newPattern = _.cloneDeep(pattern);
+
+    newPattern.forEach((row) => {
+      const stitch = row[i];
+      stitch.color = selectedColor;
+      stitch.stitch =
+        stitchType === TOGGLE
+          ? stitch.stitch === RAISED
+            ? FLAT
+            : RAISED
+          : stitchType;
+    });
+    setPattern(newPattern);
+  }
+
   function handleChangeHeight(e) {
     const newHeight = parseInt(e.target.value);
     if (!newHeight) {
@@ -142,6 +173,8 @@ export default function App() {
           style={{ float: "left" }}
           pattern={pattern}
           updatePixel={updatePixel}
+          updateRow={updateRow}
+          updateCol={updateCol}
           title={"Editor"}
         />
         <div id="all-viewers">
