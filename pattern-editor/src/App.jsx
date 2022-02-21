@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import _ from "lodash";
+import { useHotkeys } from "react-hotkeys-hook";
 import TextField from "@material-ui/core/TextField";
 import { CompactPicker } from "react-color";
 import Radio from "@mui/material/Radio";
@@ -7,63 +9,83 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
 
-import { HEIGHT, WIDTH, RAISED, FLAT, TOGGLE } from "./constants";
+import {
+  HEIGHT,
+  WIDTH,
+  RAISED,
+  FLAT,
+  TOGGLE,
+  DEFAULT_STITCH,
+} from "./constants";
 import "./styles/App.scss";
 import DrawingPanel from "./DrawingPanel";
 import ViewerGroup from "./ViewerGroup";
 import Text from "./Text";
 
 export default function App() {
+  let defaultPattern = [];
   let defaultColorMap = [];
   let defaultStitchMap = [];
   for (let row = 0; row < HEIGHT; row++) {
-    let colorRow = [];
-    let stitchRow = [];
+    let patternRow = [];
     for (let col = 0; col < WIDTH; col++) {
-      colorRow.push("#fff");
-      stitchRow.push(FLAT);
+      patternRow.push({ ...DEFAULT_STITCH });
     }
-    defaultColorMap.push(colorRow);
-    defaultStitchMap.push(stitchRow);
+    defaultPattern.push(patternRow);
   }
 
   let [selectedColor, setSelectedColor] = useState("#653294");
   let [stitchType, setStitchType] = useState(RAISED);
-  let [colorMap, setColorMap] = useState(defaultColorMap);
-  let [stitchMap, setStitchMap] = useState(defaultStitchMap);
   let [width, setWidth] = useState(WIDTH);
   let [height, setHeight] = useState(HEIGHT);
+  let [patternStack, setPatternStack] = useState([defaultPattern]);
+
+  useHotkeys("cmd+z", handleUndo, {}, [patternStack]);
+
+  function getPattern() {
+    return patternStack[0];
+  }
+
+  function pushPattern(pattern) {
+    let copy = _.cloneDeep(patternStack);
+    copy.unshift(pattern);
+    setPatternStack(copy);
+  }
+
+  function handleUndo() {
+    let copy = _.cloneDeep(patternStack);
+    copy.shift();
+    if (copy.length > 0) {
+      setPatternStack(copy);
+    } else {
+      setPatternStack([defaultPattern]);
+    }
+  }
 
   function resize(newWidth, newHeight) {
-    let newColorMap = [];
-    let newStitchMap = [];
+    let newPattern = [];
+    let oldPattern = getPattern();
     for (let row = 0; row < newHeight; row++) {
-      let colorRow = [];
-      let stitchRow = [];
+      let patternRow = [];
       for (let col = 0; col < newWidth; col++) {
-        if (colorMap[row] && colorMap[row][col]) {
-          colorRow.push(colorMap[row][col]);
-          stitchRow.push(stitchMap[row][col]);
+        if (oldPattern[row] && oldPattern[row][col]) {
+          patternRow.push({ ...oldPattern[row][col] });
         } else {
-          colorRow.push("#fff");
-          stitchRow.push(FLAT);
+          patternRow.push({ ...DEFAULT_STITCH });
         }
       }
-      newColorMap.push(colorRow);
-      newStitchMap.push(stitchRow);
+      newPattern.push(patternRow);
     }
-    setColorMap(newColorMap);
-    setStitchMap(newStitchMap);
+    pushPattern(newPattern);
   }
 
   function updatePixel(row, col) {
-    let newColorMap = [...colorMap];
-    newColorMap[row][col] = selectedColor;
-    setColorMap(newColorMap);
+    let newPattern = _.cloneDeep(getPattern());
+    newPattern[row][col].color = selectedColor;
 
     let newType;
     if (stitchType === TOGGLE) {
-      if (stitchMap[row][col] === RAISED) {
+      if (getPattern()[row][col].type === RAISED) {
         newType = FLAT;
       } else {
         newType = RAISED;
@@ -72,9 +94,39 @@ export default function App() {
       newType = stitchType;
     }
 
-    let newStitchMap = [...stitchMap];
-    newStitchMap[row][col] = newType;
-    setStitchMap(newStitchMap);
+    newPattern[row][col].type = newType;
+    pushPattern(newPattern);
+  }
+
+  function updateRow(i) {
+    let newPattern = _.cloneDeep(getPattern());
+
+    newPattern[i].forEach((stitch) => {
+      stitch.color = selectedColor;
+      stitch.type =
+        stitchType === TOGGLE
+          ? stitch.type === RAISED
+            ? FLAT
+            : RAISED
+          : stitchType;
+    });
+    pushPattern(newPattern);
+  }
+
+  function updateCol(i) {
+    let newPattern = _.cloneDeep(getPattern());
+
+    newPattern.forEach((row) => {
+      const stitch = row[i];
+      stitch.color = selectedColor;
+      stitch.type =
+        stitchType === TOGGLE
+          ? stitch.type === RAISED
+            ? FLAT
+            : RAISED
+          : stitchType;
+    });
+    pushPattern(newPattern);
   }
 
   function handleChangeHeight(e) {
@@ -95,14 +147,8 @@ export default function App() {
     resize(newWidth, height);
   }
 
-  function handleLoadStitchPattern(newMap) {
-    let newStitchMap = [...newMap];
-    setStitchMap(newStitchMap);
-  }
-
-  function handleLoadColorPattern(newMap) {
-    let newColorMap = [...newMap];
-    setColorMap(newColorMap);
+  function handleLoadPattern(newPattern) {
+    pushPattern(newPattern);
   }
 
   // TODO: Might be nice to show some instructions about what this means?
@@ -146,34 +192,36 @@ export default function App() {
         color={selectedColor}
         onChangeComplete={(color) => setSelectedColor(color.hex)}
       />
+      <div>
+        <button type="button" onClick={handleUndo}>
+          Undo
+        </button>
+      </div>
       <div style={{ display: "flex", marginTop: 10 }} className="App">
         <DrawingPanel
           style={{ float: "left" }}
-          colorMap={colorMap}
-          stitchMap={stitchMap}
+          pattern={getPattern()}
           updatePixel={updatePixel}
+          updateRow={updateRow}
+          updateCol={updateCol}
           title={"Editor"}
         />
-        <div id="all-viewers">
-          <ViewerGroup
-            style={{
-              margin: 0,
-              height: "50vh",
-              width: "40vw",
-              overflow: "scroll",
-              float: "right",
-            }}
-            stitchMap={stitchMap}
-            colorMap={colorMap}
-          />
-        </div>
+        {false && (
+          <div id="all-viewers">
+            <ViewerGroup
+              style={{
+                margin: 0,
+                height: "50vh",
+                width: "40vw",
+                overflow: "scroll",
+                float: "right",
+              }}
+              pattern={getPattern()}
+            />
+          </div>
+        )}
       </div>
-      <Text
-        rows={stitchMap}
-        colours={colorMap}
-        handleLoadStitchPattern={handleLoadStitchPattern}
-        handleLoadColorPattern={handleLoadColorPattern}
-      />
+      <Text pattern={getPattern()} handleLoadPattern={handleLoadPattern} />
     </div>
   );
 }

@@ -3,16 +3,8 @@ import Pixel from "./Pixel";
 import { FLAT } from "./constants";
 
 export default function DrawingPanel(props) {
-  const { colorMap, stitchMap, title, updatePixel } = props;
+  const { pattern, title, updatePixel, updateRow, updateCol } = props;
   let [isMouseDown, setMouseDown] = useState(false);
-
-  function updateRow(i) {
-    stitchMap[i].forEach((_, j) => updatePixel(i, j));
-  }
-
-  function updateCol(j) {
-    stitchMap.forEach((_, i) => updatePixel(i, j));
-  }
 
   return (
     <div
@@ -31,7 +23,7 @@ export default function DrawingPanel(props) {
               key={-1}
               onChange={() => {}}
             />
-            {colorMap[0].map((_, j) => (
+            {pattern[0].map((_, j) => (
               <Pixel
                 colArrow
                 color={"#ccc"}
@@ -42,7 +34,7 @@ export default function DrawingPanel(props) {
               />
             ))}
           </div>
-          {colorMap.map((row, i) => (
+          {pattern.map((row, i) => (
             <div className="row" key={i}>
               <Pixel
                 rowArrow
@@ -53,8 +45,8 @@ export default function DrawingPanel(props) {
               />
               {row.map((pixel, j) => (
                 <Pixel
-                  color={colorMap[i][j]}
-                  stitchType={stitchMap[i][j]}
+                  color={pattern[i][j].color}
+                  stitchType={pattern[i][j].type}
                   key={j}
                   onChange={() => updatePixel(i, j)}
                   isMouseDown={isMouseDown}
