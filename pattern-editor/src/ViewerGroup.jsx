@@ -1,11 +1,11 @@
 import Viewer from "./Viewer";
 
 export default function ViewerGroup(props) {
-    const { colorMap, stitchMap } = props;
+  const { colorMap, stitchMap } = props;
 
-    return (
-            <div>
-            {/* <div id="viewer">
+  return (
+    <div>
+      {/* <div id="viewer">
           <Viewer
             style={{
               margin: 0,
@@ -19,75 +19,75 @@ export default function ViewerGroup(props) {
             allowControls={true}
           />
         </div> */}
-        <div id="row1" style = {{ display: "flex" }}>
+      <div id="row1" style={{ display: "flex" }}>
         <div id="west-viewer">
-        <Viewer
-          style={{
-            margin: 0,
-            height: "50%",
-            width: "50%",
-            overflow: "scroll",
-            // float: "right",
-          }}
-          rows={stitchMap}
-          colours={colorMap}
-          allowControls={true}
-          cameraPosn={[0, 20, 20]}
-          title="West"
-        />
+          <Viewer
+            style={{
+              margin: 0,
+              height: "50%",
+              width: "50%",
+              overflow: "scroll",
+              // float: "right",
+            }}
+            rows={stitchMap}
+            colours={colorMap}
+            allowControls={true}
+            cameraPosn={[0, 20, 20]}
+            title="West"
+          />
+        </div>
+        <div id="east-viewer">
+          <Viewer
+            style={{
+              margin: 0,
+              height: "50%",
+              width: "50%",
+              overflow: "scroll",
+              float: "right",
+            }}
+            rows={stitchMap}
+            colours={colorMap}
+            allowControls={true}
+            //   todo: should really be related to width/height
+            cameraPosn={[0, 20, -20]}
+            title="East"
+          />
+        </div>
       </div>
-      <div id="east-viewer">
-        <Viewer
-          style={{
-            margin: 0,
-            height: "50%",
-            width: "50%",
-            overflow: "scroll",
-            float: "right",
-          }}
-          rows={stitchMap}
-          colours={colorMap}
-          allowControls={true}
-        //   todo: should really be related to width/height
-          cameraPosn={[0, 20, -20]}
-          title="East"
-        />
+      <div id="row1" style={{ display: "flex" }}>
+        <div id="north-viewer">
+          <Viewer
+            style={{
+              margin: 0,
+              height: "50%",
+              width: "50%",
+              overflow: "scroll",
+              // float: "right",
+            }}
+            rows={stitchMap}
+            colours={colorMap}
+            allowControls={true}
+            cameraPosn={[30, 20, 0]}
+            title="North"
+          />
+        </div>
+        <div id="south-viewer">
+          <Viewer
+            style={{
+              margin: 0,
+              height: "50%",
+              width: "50%",
+              overflow: "scroll",
+              float: "right",
+            }}
+            rows={stitchMap}
+            colours={colorMap}
+            allowControls={true}
+            cameraPosn={[-30, 20, 0]}
+            title="South"
+          />
+        </div>
       </div>
-      </div>
-      <div id="row1" style = {{ display: "flex" }}>
-      <div id="north-viewer">
-        <Viewer
-          style={{
-            margin: 0,
-            height: "50%",
-            width: "50%",
-            overflow: "scroll",
-            // float: "right",
-          }}
-          rows={stitchMap}
-          colours={colorMap}
-          allowControls={true}
-          cameraPosn={[30, 20, 0]}
-          title="North"
-        />
-      </div>
-      <div id="south-viewer">
-        <Viewer
-          style={{
-            margin: 0,
-            height: "50%",
-            width: "50%",
-            overflow: "scroll",
-            float: "right",
-          }}
-          rows={stitchMap}
-          colours={colorMap}
-          allowControls={true}
-          cameraPosn={[-30, 20, 0]}
-          title="South"
-        />
-      </div>
-      </div>
-      </div>
-        );
+    </div>
+  );
 }
