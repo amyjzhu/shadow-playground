@@ -20,6 +20,7 @@ import {
 import "./styles/App.scss";
 import DrawingPanel from "./DrawingPanel";
 import ViewerGroup from "./ViewerGroup";
+import ViewEditorGroup from "./ViewEditorGroup";
 import Text from "./Text";
 
 export default function App() {
@@ -80,6 +81,7 @@ export default function App() {
   }
 
   function updatePixel(row, col) {
+    console.log("edit made at " + row + ", " + col);
     let newPattern = _.cloneDeep(getPattern());
     newPattern[row][col].color = selectedColor;
 
@@ -95,6 +97,14 @@ export default function App() {
     }
 
     newPattern[row][col].type = newType;
+    pushPattern(newPattern);
+  }
+
+  function updatePixelSpecific(row, col, type, colour = selectedColor) {
+    let newPattern = _.cloneDeep(getPattern());
+    newPattern[row][col].color = colour;
+
+    newPattern[row][col].type = type;
     pushPattern(newPattern);
   }
 
@@ -206,8 +216,21 @@ export default function App() {
           updateCol={updateCol}
           title={"Editor"}
         />
-        {false && (
-          <div id="all-viewers">
+        <ViewEditorGroup
+          style={{
+            margin: 0,
+            height: "50vh",
+            width: "40vw",
+            overflow: "scroll",
+            float: "right",
+          }}
+          pattern={getPattern()}
+          updatePixelSpecific={updatePixelSpecific}
+          selectedColor={selectedColor}
+          title={"Viewer"}
+        />
+        
+          {/* <div id="all-viewers">
             <ViewerGroup
               style={{
                 margin: 0,
@@ -218,8 +241,8 @@ export default function App() {
               }}
               pattern={getPattern()}
             />
-          </div>
-        )}
+          </div> */}
+        
       </div>
       <Text pattern={getPattern()} handleLoadPattern={handleLoadPattern} />
     </div>
