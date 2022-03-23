@@ -10,6 +10,11 @@ export default function ViewEditor(props) {
     let order = generateOrder(direction);
     let view = calculateView(order, pattern);
 
+    let rules = [];
+    populateRules();
+    let cycle = 0;
+
+
     function generateOrder(direction) {
         // 0 1 2 3
         // 4 5 6 7
@@ -119,6 +124,50 @@ export default function ViewEditor(props) {
         return base_pattern;
     }
 
+    function populateRules() {
+        
+        let doNothing = (prev_row, prev_col, row, col, pattern, desired) => {};
+        rules.push({
+            pred: (prev_row, prev_col, row, col, pattern, desired) => {
+                if (pattern[row][col].color == desired) {
+                    return pattern[row][col].type == RAISED;
+                }
+            },
+            action: doNothing,
+        });
+
+        rules.push({
+            pred: (prev_row, prev_col, row, col, pattern, desired) => {
+                if (pattern[row][col].color == desired) {
+                    return !pattern[row][col].type == RAISED;
+                }
+            },
+            action: (prev_row, prev_col, row, col, pattern, desired) => {
+                updatePixelSpecific(row, col, RAISED);
+            },
+        });
+
+        rules.push({
+            pred: (prev_row, prev_col, row, col, pattern, desired) => {
+                if (pattern[prev_row][prev_col].color == desired) {
+                    return !pattern[row][col].type == RAISED;
+                }
+            },
+            action: (prev_row, prev_col, row, col, pattern, desired) => {
+                updatePixelSpecific(prev_row[0], prev_row[1], RAISED);
+            },
+        });
+
+        rules.push({
+            pred: (prev_row, prev_col, row, col, pattern, desired) => {
+                return (pattern[prev_row][prev_col].color !== desired
+                    && pattern[row][col].color !== desired);
+            },
+            action: (prev_row, prev_col, row, col, pattern, desired) => {
+                updatePixelSpecific(row, col, RAISED, desired);
+            },
+        });
+    }
 
     function modify_pixel(i, j, desired) {
         // TODO need to account for "reversed"? no... Idk
@@ -160,6 +209,8 @@ export default function ViewEditor(props) {
 // 2. front pixel is correct. flatten current, raise front
 // 3. both incorrect. change flat and rise.
 // supply correct prev row given view 
+
+        
         let prev_row;
         if (direction == 0) {
             if (row - 1 >= 0) {
@@ -188,7 +239,21 @@ export default function ViewEditor(props) {
         } else {
             prev_row = undefined
         }
+        // when rules get updated, cycle does also. 
 
+        let in_cycle = 0;
+        for (let rule of rules) {
+            if (rule.pred(prev_row[0], prev_row[1], row, col, pattern, desired)) {
+                console.log("trying rule, cycle is " + in_cycle);
+                if (in_cycle == cycle) {
+                    rule.action(prev_row[0], prev_row[1], row, col, pattern, desired)
+                } else {
+                    in_cycle++;
+                }
+            }
+        }
+
+/*
         if (prev_row != undefined) {
             let pixel = pattern[row][col].color;
             if (pixel == desired) {
@@ -203,8 +268,8 @@ export default function ViewEditor(props) {
                 // option 1: raise the desired pixel
                 // option 2: flatten the desired pixel and the pixel in front
             } else if (pattern[prev_row[0], prev_row[1]].color == selectedColour) { 
-                // pixel in front is the 
-                // we can flatten and raise
+                // pixel in front is the correct colour
+                // 
                 pattern[row][col].type = FLAT;
                 pattern[prev_row[0], prev_row[1]].type = RAISED;
                 updatePixelSpecific(row, col, RAISED);
@@ -237,7 +302,7 @@ export default function ViewEditor(props) {
             updatePixelSpecific(row, col, FLAT, desired);
             updatePixelSpecific(prev_row[0], prev_row[1], FLAT, desired);
             console.log("keeping it flat at " + row, + ", " + col);
-        }
+        }*/
     }
 
 
