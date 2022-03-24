@@ -82,14 +82,8 @@ export default function ViewEditor(props) {
             for (let j = 0; j < width; j++) {
                 let order_elt = order[i][j];
                 rotated[i][j] = pattern[order_elt[0]][order_elt[1]];
-                // if (direction == 1) {
-                    // console.log(i + ", " + j + " grabbing from " + order_elt[0] + ", " + order_elt[1]);
-                // }
             }
         }
-        // console.log(rotated);
-        // rotated.reverse();
-        // we should start by properly reorienting each piece...
 
 
         let view = JSON.parse(JSON.stringify(rotated));
@@ -252,57 +246,6 @@ export default function ViewEditor(props) {
                 }
             }
         }
-
-/*
-        if (prev_row != undefined) {
-            let pixel = pattern[row][col].color;
-            if (pixel == desired) {
-                if (pattern[row][col].type == RAISED) {
-                    // no action needed
-                    // alternative: make sure pixel in front is lowered 
-                } else {
-                    // raise the flat pixel 
-                    pattern[row][col].type = RAISED;
-                    updatePixelSpecific(row, col, RAISED);
-                }
-                // option 1: raise the desired pixel
-                // option 2: flatten the desired pixel and the pixel in front
-            } else if (pattern[prev_row[0], prev_row[1]].color == selectedColour) { 
-                // pixel in front is the correct colour
-                // 
-                pattern[row][col].type = FLAT;
-                pattern[prev_row[0], prev_row[1]].type = RAISED;
-                updatePixelSpecific(row, col, RAISED);
-                updatePixelSpecific(prev_row[0], prev_row[1], RAISED);
-            } else {
-                // we must sacrifice
-                pattern[row][col].color = desired;
-                pattern[row][col].type = RAISED;
-                updatePixelSpecific(row, col, RAISED, desired);
-                // try making some kind of naive/basic loop that uses simple heuristic order
-                // which image to put down first?
-                // what about considering the constraints on the other views?
-
-                // actions:
-                // 1. quantify and understand impact of cases
-                // 2. try looping over the image and inputs e.g. 10x 
-                // ILP comparison (look at the cost) with GA 
-                // 3. look through different options (cycle on click)
-                // 3.5 editing the heuristic on the UI
-                // 4. Do this but think about other views (in theory)
-            }
-        } // todo: do something smarter with edges... 
-        else {
-            // we must sacrifice
-            pattern[row][col].color = desired;
-
-            // let's try just keeping it lowered and lowering the front one 
-            // pattern[row][col].type = FLAT;
-            // pattern[prev_row[0], prev_row[1]].type = FLAT;
-            updatePixelSpecific(row, col, FLAT, desired);
-            updatePixelSpecific(prev_row[0], prev_row[1], FLAT, desired);
-            console.log("keeping it flat at " + row, + ", " + col);
-        }*/
     }
 
 
