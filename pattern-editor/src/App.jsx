@@ -46,6 +46,28 @@ export default function App() {
     setPattern(newPattern);
   }
 
+  function handleResize(newHeight, newWidth) {
+    if (!newHeight || !newWidth) {
+      return;
+    }
+    let newPattern = [];
+    let oldPattern = pattern;
+    for (let row = 0; row < newHeight; row++) {
+      let patternRow = [];
+      for (let col = 0; col < newWidth; col++) {
+        if (oldPattern[row] && oldPattern[row][col]) {
+          patternRow.push({ ...oldPattern[row][col] });
+        } else {
+          patternRow.push({ ...DEFAULT_STITCH });
+        }
+      }
+      newPattern.push(patternRow);
+    }
+    setWidth(newWidth);
+    setHeight(newHeight);
+    setPattern(newPattern);
+  }
+
   return (
     <div>
       <h1>Pattern Editor/Visualizer</h1>
@@ -55,9 +77,8 @@ export default function App() {
         stitchType={stitchType}
         width={width}
         setColour={setColour}
-        setHeight={setHeight}
         setStitchType={setStitchType}
-        setWidth={setWidth}
+        handleResize={handleResize}
       />
       <StitchGrid label="TOP" pattern={pattern} updatePixel={updatePixel} />
       <StitchGrid label="NORTH" pattern={pattern} />

@@ -34,7 +34,9 @@ export default function OptionEditor(props) {
           label="Rows"
           variant="outlined"
           defaultValue={HEIGHT}
-          onBlur={handleChangeHeight}
+          onBlur={(e) =>
+            props.handleResize(parseInt(e.target.value), props.width)
+          }
         />
         <TextField
           style={styles.textField}
@@ -42,7 +44,9 @@ export default function OptionEditor(props) {
           label="Stitches per Row"
           variant="outlined"
           defaultValue={WIDTH}
-          onBlur={handleChangeWidth}
+          onBlur={(e) =>
+            props.handleResize(props.height, parseInt(e.target.value))
+          }
         />
       </div>
       <FormControl>
