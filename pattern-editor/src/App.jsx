@@ -141,10 +141,10 @@ export default function App() {
         updateCol={updateCol}
         updateRow={updateRow}
       />
-      <StitchGrid label="NORTH" pattern={getPattern()} />
-      <StitchGrid label="SOUTH" pattern={getPattern()} />
-      <StitchGrid label="EAST" pattern={getPattern()} />
-      <StitchGrid label="WEST" pattern={getPattern()} />
+      <StitchGrid label="NORTH" pattern={getPattern()} viewOnly />
+      <StitchGrid label="SOUTH" pattern={getPattern()} viewOnly />
+      <StitchGrid label="EAST" pattern={getPattern()} viewOnly />
+      <StitchGrid label="WEST" pattern={getPattern()} viewOnly />
     </div>
   );
 }

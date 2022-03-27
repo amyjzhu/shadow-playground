@@ -3,37 +3,46 @@ import { FLAT, GRAY, WHITE } from "./constants";
 import Pixel from "./Pixel";
 
 export default function StitchGrid(props) {
-  const { colour, label, pattern, updatePixel, updateCol, updateRow } = props;
   return (
     <div className="stitch-grid">
-      <h2>{label}</h2>
+      <h2>{props.label}</h2>
       <div className="pixels">
-        <div className="row">
-          <Pixel colour={GRAY} stitchType={FLAT} key={-1} onChange={() => {}} />
-          {pattern[0].map((_, j) => (
+        {!props.viewOnly && (
+          <div className="row">
             <Pixel
-              colArrow
               colour={GRAY}
               stitchType={FLAT}
-              key={j}
-              onChange={() => updateCol(j)}
+              key={-1}
+              onChange={() => {}}
             />
-          ))}
-        </div>
-        {pattern.map((row, i) => (
+            {props.pattern[0].map((_, j) => (
+              <Pixel
+                colArrow
+                colour={GRAY}
+                stitchType={FLAT}
+                key={j}
+                onChange={() => props.updateCol(j)}
+              />
+            ))}
+          </div>
+        )}
+        {props.pattern.map((row, i) => (
           <div className="row" key={i}>
-            <Pixel
-              rowArrow
-              colour={GRAY}
-              stitchType={FLAT}
-              onChange={() => updateRow(i)}
-            />
+            {!props.viewOnly && (
+              <Pixel
+                rowArrow
+                colour={GRAY}
+                stitchType={FLAT}
+                onChange={() => props.updateRow(i)}
+              />
+            )}
             {row.map((pixel, j) => (
               <Pixel
                 key={j}
-                colour={pattern[i][j].colour}
-                stitchType={pattern[i][j].type}
-                onChange={() => updatePixel(i, j)}
+                colour={props.pattern[i][j].colour}
+                stitchType={props.pattern[i][j].type}
+                onChange={() => props.updatePixel(i, j)}
+                viewOnly={props.viewOnly}
               />
             ))}
           </div>

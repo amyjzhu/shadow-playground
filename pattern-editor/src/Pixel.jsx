@@ -2,14 +2,18 @@ import React from "react";
 import { RAISED, WHITE } from "./constants";
 
 export default function Pixel(props) {
-  const { colour, onChange, stitchType, rowArrow, colArrow } = props;
+  const { colour, onChange, stitchType, rowArrow, colArrow, viewOnly } = props;
   const dotColour = colour === WHITE ? "#ccc" : WHITE;
 
   return (
     <div
-      style={{ backgroundColor: colour, border: "1px solid #D3D3D3" }}
+      style={{
+        backgroundColor: colour,
+        border: "1px solid #D3D3D3",
+        cursor: viewOnly ? "default" : "pointer",
+      }}
       className="pixel"
-      onClick={onChange}
+      onClick={viewOnly ? undefined : onChange}
     >
       {rowArrow && (
         <i style={{ paddingTop: 5 }} className="fa fa-angle-right"></i>
