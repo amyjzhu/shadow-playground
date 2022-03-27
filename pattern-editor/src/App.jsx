@@ -1,8 +1,17 @@
 import React, { useState } from "react";
+import _ from "lodash";
 import "./styles/App.scss";
 import OptionEditor from "./OptionEditor";
 import StitchGrid from "./StitchGrid";
-import { HEIGHT, WIDTH, DEFAULT_STITCH, WHITE, RAISED } from "./constants";
+import {
+  HEIGHT,
+  WIDTH,
+  DEFAULT_STITCH,
+  WHITE,
+  RAISED,
+  TOGGLE,
+  FLAT,
+} from "./constants";
 
 export default function App() {
   let defaultPattern = [];
@@ -20,6 +29,23 @@ export default function App() {
   let [height, setHeight] = useState(HEIGHT);
   let [stitchType, setStitchType] = useState(RAISED);
 
+  function updatePixel(row, col) {
+    let newPattern = _.cloneDeep(pattern);
+    newPattern[row][col].colour = colour;
+    let newType;
+    if (stitchType === TOGGLE) {
+      if (pattern[row][col].type === RAISED) {
+        newType = FLAT;
+      } else {
+        newType = RAISED;
+      }
+    } else {
+      newType = stitchType;
+    }
+    newPattern[row][col].type = newType;
+    setPattern(newPattern);
+  }
+
   return (
     <div>
       <h1>Pattern Editor/Visualizer</h1>
@@ -33,7 +59,7 @@ export default function App() {
         setStitchType={setStitchType}
         setWidth={setWidth}
       />
-      <StitchGrid label="TOP" pattern={pattern} />
+      <StitchGrid label="TOP" pattern={pattern} updatePixel={updatePixel} />
       <StitchGrid label="NORTH" pattern={pattern} />
       <StitchGrid label="SOUTH" pattern={pattern} />
       <StitchGrid label="EAST" pattern={pattern} />

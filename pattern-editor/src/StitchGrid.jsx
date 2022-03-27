@@ -3,7 +3,7 @@ import { FLAT } from "./constants";
 import Pixel from "./Pixel";
 
 export default function StitchGrid(props) {
-  const { label, pattern } = props;
+  const { colour, label, pattern, updatePixel } = props;
   return (
     <div className="stitch-grid">
       <h2>{label}</h2>
@@ -11,7 +11,12 @@ export default function StitchGrid(props) {
         {pattern.map((row, i) => (
           <div className="row" key={i}>
             {row.map((pixel, j) => (
-              <Pixel key={j} color={"#fff"} stitchType={FLAT} />
+              <Pixel
+                key={j}
+                colour={pattern[i][j].colour}
+                stitchType={pattern[i][j].type}
+                onChange={() => updatePixel(i, j)}
+              />
             ))}
           </div>
         ))}

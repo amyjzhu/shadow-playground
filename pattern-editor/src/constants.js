@@ -7,4 +7,4 @@ export const TOGGLE = 2;
 
 export const WHITE = "#fff";
 
-export const DEFAULT_STITCH = { color: WHITE, type: FLAT };
+export const DEFAULT_STITCH = { colour: WHITE, type: FLAT };
