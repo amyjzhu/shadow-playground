@@ -46,6 +46,35 @@ export default function App() {
     setPattern(newPattern);
   }
 
+  function updateRow(row) {
+    let newPattern = _.cloneDeep(pattern);
+    newPattern[row].forEach((stitch) => {
+      stitch.colour = colour;
+      stitch.type =
+        stitchType === TOGGLE
+          ? stitch.type === RAISED
+            ? FLAT
+            : RAISED
+          : stitchType;
+    });
+    setPattern(newPattern);
+  }
+
+  function updateCol(col) {
+    let newPattern = _.cloneDeep(pattern);
+    newPattern.forEach((row) => {
+      const stitch = row[col];
+      stitch.colour = colour;
+      stitch.type =
+        stitchType === TOGGLE
+          ? stitch.type === RAISED
+            ? FLAT
+            : RAISED
+          : stitchType;
+    });
+    setPattern(newPattern);
+  }
+
   function handleResize(newHeight, newWidth) {
     if (!newHeight || !newWidth) {
       return;
@@ -80,7 +109,13 @@ export default function App() {
         setStitchType={setStitchType}
         handleResize={handleResize}
       />
-      <StitchGrid label="TOP" pattern={pattern} updatePixel={updatePixel} />
+      <StitchGrid
+        label="TOP"
+        pattern={pattern}
+        updatePixel={updatePixel}
+        updateCol={updateCol}
+        updateRow={updateRow}
+      />
       <StitchGrid label="NORTH" pattern={pattern} />
       <StitchGrid label="SOUTH" pattern={pattern} />
       <StitchGrid label="EAST" pattern={pattern} />

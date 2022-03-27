@@ -2,7 +2,7 @@ import React from "react";
 import { RAISED, WHITE } from "./constants";
 
 export default function Pixel(props) {
-  const { colour, onChange, stitchType } = props;
+  const { colour, onChange, stitchType, rowArrow, colArrow } = props;
   const dotColour = colour === WHITE ? "#ccc" : WHITE;
 
   return (
@@ -11,6 +11,12 @@ export default function Pixel(props) {
       className="pixel"
       onClick={onChange}
     >
+      {rowArrow && (
+        <i style={{ paddingTop: 5 }} className="fa fa-angle-right"></i>
+      )}
+      {colArrow && (
+        <i style={{ paddingTop: 5 }} className="fa fa-angle-down"></i>
+      )}
       {stitchType === RAISED && (
         <i
           style={{ color: dotColour, paddingTop: 5, fontSize: 8 }}
