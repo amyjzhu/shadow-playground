@@ -21,7 +21,7 @@ export default function Pixel(props) {
       {colArrow && (
         <i style={{ paddingTop: 5 }} className="fa fa-angle-down"></i>
       )}
-      {stitchType === RAISED && (
+      {!viewOnly && stitchType === RAISED && (
         <i
           style={{ color: dotColour, paddingTop: 5, fontSize: 8 }}
           className="fa fa-circle"

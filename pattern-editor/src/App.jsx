@@ -9,6 +9,7 @@ import {
   HEIGHT,
   WIDTH,
   DEFAULT_STITCH,
+  DIRECTION,
   WHITE,
   RAISED,
   TOGGLE,
@@ -122,6 +123,65 @@ export default function App() {
     pushPattern(newPattern);
   }
 
+  function getFrontStitchForDirection(direction, row, col, pattern) {
+    switch (direction) {
+      case DIRECTION.NORTH: {
+        return row > 0 && pattern[row - 1][col];
+      }
+      case DIRECTION.SOUTH: {
+        return row < pattern.length - 1 && pattern[row + 1][col];
+      }
+      case DIRECTION.EAST: {
+        return pattern[row][col + 1];
+      }
+      case DIRECTION.WEST: {
+        return pattern[row][col - 1];
+      }
+      default:
+        return pattern[row][col];
+    }
+  }
+
+  function getPatternForDirection(direction) {
+    let pattern = getPattern();
+    let newPattern = _.cloneDeep(pattern);
+    for (let row = 0; row < height; row++) {
+      for (let col = 0; col < width; col++) {
+        let frontStitch = getFrontStitchForDirection(
+          direction,
+          row,
+          col,
+          pattern
+        );
+        if (frontStitch && frontStitch.type === RAISED) {
+          newPattern[row][col].colour = frontStitch.colour;
+        }
+      }
+    }
+
+    let transpose = (arr) => arr[0].map((_, i) => arr.map((row) => row[i]));
+
+    switch (direction) {
+      case DIRECTION.NORTH: {
+        newPattern.forEach((row) => row.reverse());
+        newPattern.reverse();
+        break;
+      }
+      case DIRECTION.WEST: {
+        newPattern = transpose(newPattern);
+
+        newPattern.reverse();
+        break;
+      }
+      case DIRECTION.EAST: {
+        newPattern = transpose(newPattern);
+        newPattern.forEach((row) => row.reverse());
+        break;
+      }
+    }
+    return newPattern;
+  }
+
   return (
     <div>
       <h1>Pattern Editor/Visualizer</h1>
@@ -141,10 +201,26 @@ export default function App() {
         updateCol={updateCol}
         updateRow={updateRow}
       />
-      <StitchGrid label="NORTH" pattern={getPattern()} viewOnly />
-      <StitchGrid label="SOUTH" pattern={getPattern()} viewOnly />
-      <StitchGrid label="EAST" pattern={getPattern()} viewOnly />
-      <StitchGrid label="WEST" pattern={getPattern()} viewOnly />
+      <StitchGrid
+        label="NORTH"
+        pattern={getPatternForDirection(DIRECTION.NORTH)}
+        viewOnly
+      />
+      <StitchGrid
+        label="SOUTH"
+        pattern={getPatternForDirection(DIRECTION.SOUTH)}
+        viewOnly
+      />
+      <StitchGrid
+        label="EAST"
+        pattern={getPatternForDirection(DIRECTION.EAST)}
+        viewOnly
+      />
+      <StitchGrid
+        label="WEST"
+        pattern={getPatternForDirection(DIRECTION.WEST)}
+        viewOnly
+      />
     </div>
   );
 }
