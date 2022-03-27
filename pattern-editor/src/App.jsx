@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import _ from "lodash";
+import { useHotkeys } from "react-hotkeys-hook";
+
 import "./styles/App.scss";
 import OptionEditor from "./OptionEditor";
 import StitchGrid from "./StitchGrid";
@@ -23,18 +25,41 @@ export default function App() {
     defaultPattern.push(patternRow);
   }
 
-  let [pattern, setPattern] = useState(defaultPattern);
+  let [patternStack, setPatternStack] = useState([defaultPattern]);
   let [colour, setColour] = useState(WHITE);
   let [width, setWidth] = useState(WIDTH);
   let [height, setHeight] = useState(HEIGHT);
   let [stitchType, setStitchType] = useState(RAISED);
 
+  useHotkeys("cmd+z", handleUndo, {}, [patternStack]);
+
+  function getPattern() {
+    return patternStack[0];
+  }
+
+  function pushPattern(pattern) {
+    let copy = _.cloneDeep(patternStack);
+    copy.unshift(pattern);
+    setPatternStack(copy);
+  }
+
+  function handleUndo() {
+    let copy = _.cloneDeep(patternStack);
+    copy.shift();
+    if (copy.length > 0) {
+      setPatternStack(copy);
+    } else {
+      setPatternStack([defaultPattern]);
+    }
+  }
+
   function updatePixel(row, col) {
-    let newPattern = _.cloneDeep(pattern);
+    let newPattern = _.cloneDeep(getPattern());
+    let oldPattern = getPattern();
     newPattern[row][col].colour = colour;
     let newType;
     if (stitchType === TOGGLE) {
-      if (pattern[row][col].type === RAISED) {
+      if (oldPattern[row][col].type === RAISED) {
         newType = FLAT;
       } else {
         newType = RAISED;
@@ -43,11 +68,11 @@ export default function App() {
       newType = stitchType;
     }
     newPattern[row][col].type = newType;
-    setPattern(newPattern);
+    pushPattern(newPattern);
   }
 
   function updateRow(row) {
-    let newPattern = _.cloneDeep(pattern);
+    let newPattern = _.cloneDeep(getPattern());
     newPattern[row].forEach((stitch) => {
       stitch.colour = colour;
       stitch.type =
@@ -57,11 +82,11 @@ export default function App() {
             : RAISED
           : stitchType;
     });
-    setPattern(newPattern);
+    pushPattern(newPattern);
   }
 
   function updateCol(col) {
-    let newPattern = _.cloneDeep(pattern);
+    let newPattern = _.cloneDeep(getPattern());
     newPattern.forEach((row) => {
       const stitch = row[col];
       stitch.colour = colour;
@@ -72,7 +97,7 @@ export default function App() {
             : RAISED
           : stitchType;
     });
-    setPattern(newPattern);
+    pushPattern(newPattern);
   }
 
   function handleResize(newHeight, newWidth) {
@@ -80,7 +105,7 @@ export default function App() {
       return;
     }
     let newPattern = [];
-    let oldPattern = pattern;
+    let oldPattern = _.cloneDeep(getPattern());
     for (let row = 0; row < newHeight; row++) {
       let patternRow = [];
       for (let col = 0; col < newWidth; col++) {
@@ -94,7 +119,7 @@ export default function App() {
     }
     setWidth(newWidth);
     setHeight(newHeight);
-    setPattern(newPattern);
+    pushPattern(newPattern);
   }
 
   return (
@@ -111,15 +136,15 @@ export default function App() {
       />
       <StitchGrid
         label="TOP"
-        pattern={pattern}
+        pattern={getPattern()}
         updatePixel={updatePixel}
         updateCol={updateCol}
         updateRow={updateRow}
       />
-      <StitchGrid label="NORTH" pattern={pattern} />
-      <StitchGrid label="SOUTH" pattern={pattern} />
-      <StitchGrid label="EAST" pattern={pattern} />
-      <StitchGrid label="WEST" pattern={pattern} />
+      <StitchGrid label="NORTH" pattern={getPattern()} />
+      <StitchGrid label="SOUTH" pattern={getPattern()} />
+      <StitchGrid label="EAST" pattern={getPattern()} />
+      <StitchGrid label="WEST" pattern={getPattern()} />
     </div>
   );
 }
