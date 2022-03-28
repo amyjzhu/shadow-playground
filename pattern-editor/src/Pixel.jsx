@@ -1,21 +1,19 @@
 import React from "react";
-import { RAISED } from "./constants";
+import { RAISED, WHITE } from "./constants";
 
 export default function Pixel(props) {
-  const { color, onChange, stitchType, rowArrow, colArrow } = props;
-
-  const dotColor = color === "#ffffff" ? "#ccc" : "#fff";
+  const { colour, onChange, stitchType, rowArrow, colArrow, viewOnly } = props;
+  const dotColour = colour === WHITE ? "#ccc" : WHITE;
 
   return (
     <div
-      style={{ backgroundColor: color, border: "1px solid #D3D3D3" }}
-      className="pixel"
-      onClick={onChange}
-      onMouseOver={(e) => {
-        if (props.isMouseDown) {
-          onChange(e);
-        }
+      style={{
+        backgroundColor: colour,
+        border: "1px solid #D3D3D3",
+        cursor: viewOnly ? "default" : "pointer",
       }}
+      className="pixel"
+      onClick={viewOnly ? undefined : onChange}
     >
       {rowArrow && (
         <i style={{ paddingTop: 5 }} className="fa fa-angle-right"></i>
@@ -23,11 +21,11 @@ export default function Pixel(props) {
       {colArrow && (
         <i style={{ paddingTop: 5 }} className="fa fa-angle-down"></i>
       )}
-      {stitchType === RAISED && (
+      {!viewOnly && stitchType === RAISED && (
         <i
-          style={{ color: dotColor, paddingTop: 5, fontSize: 8 }}
+          style={{ color: dotColour, paddingTop: 5, fontSize: 8 }}
           className="fa fa-circle"
-        ></i>
+        />
       )}
     </div>
   );

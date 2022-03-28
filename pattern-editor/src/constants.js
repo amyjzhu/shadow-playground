@@ -5,4 +5,15 @@ export const RAISED = 1;
 export const FLAT = 0;
 export const TOGGLE = 2;
 
-export const DEFAULT_STITCH = { color: "#fff", type: FLAT };
+export const WHITE = "#fff";
+export const GRAY = "#ccc";
+
+export const DIRECTION = {
+  TOP: "TOP",
+  NORTH: "NORTH",
+  SOUTH: "SOUTH",
+  EAST: "EAST",
+  WEST: "WEST",
+};
+
+export const DEFAULT_STITCH = { colour: WHITE, type: FLAT };

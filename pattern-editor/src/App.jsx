@@ -1,31 +1,23 @@
 import React, { useState } from "react";
 import _ from "lodash";
 import { useHotkeys } from "react-hotkeys-hook";
-import TextField from "@material-ui/core/TextField";
-import { CompactPicker } from "react-color";
-import Radio from "@mui/material/Radio";
-import RadioGroup from "@mui/material/RadioGroup";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import FormControl from "@mui/material/FormControl";
-import FormLabel from "@mui/material/FormLabel";
 
+import "./styles/App.scss";
+import OptionEditor from "./OptionEditor";
+import StitchGrid from "./StitchGrid";
 import {
   HEIGHT,
   WIDTH,
-  RAISED,
-  FLAT,
-  TOGGLE,
   DEFAULT_STITCH,
+  DIRECTION,
+  WHITE,
+  RAISED,
+  TOGGLE,
+  FLAT,
 } from "./constants";
-import "./styles/App.scss";
-import DrawingPanel from "./DrawingPanel";
-import ViewerGroup from "./ViewerGroup";
-import Text from "./Text";
 
 export default function App() {
   let defaultPattern = [];
-  let defaultColorMap = [];
-  let defaultStitchMap = [];
   for (let row = 0; row < HEIGHT; row++) {
     let patternRow = [];
     for (let col = 0; col < WIDTH; col++) {
@@ -34,11 +26,11 @@ export default function App() {
     defaultPattern.push(patternRow);
   }
 
-  let [selectedColor, setSelectedColor] = useState("#653294");
-  let [stitchType, setStitchType] = useState(RAISED);
+  let [patternStack, setPatternStack] = useState([defaultPattern]);
+  let [colour, setColour] = useState(WHITE);
   let [width, setWidth] = useState(WIDTH);
   let [height, setHeight] = useState(HEIGHT);
-  let [patternStack, setPatternStack] = useState([defaultPattern]);
+  let [stitchType, setStitchType] = useState(RAISED);
 
   useHotkeys("cmd+z", handleUndo, {}, [patternStack]);
 
@@ -62,9 +54,59 @@ export default function App() {
     }
   }
 
-  function resize(newWidth, newHeight) {
-    let newPattern = [];
+  function updatePixel(row, col) {
+    let newPattern = _.cloneDeep(getPattern());
     let oldPattern = getPattern();
+    newPattern[row][col].colour = colour;
+    let newType;
+    if (stitchType === TOGGLE) {
+      if (oldPattern[row][col].type === RAISED) {
+        newType = FLAT;
+      } else {
+        newType = RAISED;
+      }
+    } else {
+      newType = stitchType;
+    }
+    newPattern[row][col].type = newType;
+    pushPattern(newPattern);
+  }
+
+  function updateRow(row) {
+    let newPattern = _.cloneDeep(getPattern());
+    newPattern[row].forEach((stitch) => {
+      stitch.colour = colour;
+      stitch.type =
+        stitchType === TOGGLE
+          ? stitch.type === RAISED
+            ? FLAT
+            : RAISED
+          : stitchType;
+    });
+    pushPattern(newPattern);
+  }
+
+  function updateCol(col) {
+    let newPattern = _.cloneDeep(getPattern());
+    newPattern.forEach((row) => {
+      const stitch = row[col];
+      stitch.colour = colour;
+      stitch.type =
+        stitchType === TOGGLE
+          ? stitch.type === RAISED
+            ? FLAT
+            : RAISED
+          : stitchType;
+    });
+    pushPattern(newPattern);
+  }
+
+  function handleResize(newHeight, newWidth) {
+    if (!newHeight || !newWidth) {
+      return;
+    }
+    let newPattern = [];
+    let oldPattern = _.cloneDeep(getPattern());
     for (let row = 0; row < newHeight; row++) {
       let patternRow = [];
       for (let col = 0; col < newWidth; col++) {
@@ -76,157 +118,109 @@ export default function App() {
       }
       newPattern.push(patternRow);
     }
-    pushPattern(newPattern);
-  }
-
-  function updatePixel(row, col) {
-    let newPattern = _.cloneDeep(getPattern());
-    newPattern[row][col].color = selectedColor;
-
-    let newType;
-    if (stitchType === TOGGLE) {
-      if (getPattern()[row][col].type === RAISED) {
-        newType = FLAT;
-      } else {
-        newType = RAISED;
-      }
-    } else {
-      newType = stitchType;
-    }
-
-    newPattern[row][col].type = newType;
-    pushPattern(newPattern);
-  }
-
-  function updateRow(i) {
-    let newPattern = _.cloneDeep(getPattern());
-
-    newPattern[i].forEach((stitch) => {
-      stitch.color = selectedColor;
-      stitch.type =
-        stitchType === TOGGLE
-          ? stitch.type === RAISED
-            ? FLAT
-            : RAISED
-          : stitchType;
-    });
-    pushPattern(newPattern);
-  }
-
-  function updateCol(i) {
-    let newPattern = _.cloneDeep(getPattern());
-
-    newPattern.forEach((row) => {
-      const stitch = row[i];
-      stitch.color = selectedColor;
-      stitch.type =
-        stitchType === TOGGLE
-          ? stitch.type === RAISED
-            ? FLAT
-            : RAISED
-          : stitchType;
-    });
-    pushPattern(newPattern);
-  }
-
-  function handleChangeHeight(e) {
-    const newHeight = parseInt(e.target.value);
-    if (!newHeight) {
-      return;
-    }
-    setHeight(newHeight);
-    resize(width, newHeight);
-  }
-
-  function handleChangeWidth(e) {
-    const newWidth = parseInt(e.target.value);
-    if (!newWidth) {
-      return;
-    }
     setWidth(newWidth);
-    resize(newWidth, height);
-  }
-
-  function handleLoadPattern(newPattern) {
+    setHeight(newHeight);
     pushPattern(newPattern);
   }
 
-  // TODO: Might be nice to show some instructions about what this means?
+  function getFrontStitchForDirection(direction, row, col, pattern) {
+    switch (direction) {
+      case DIRECTION.NORTH: {
+        return row > 0 && pattern[row - 1][col];
+      }
+      case DIRECTION.SOUTH: {
+        return row < pattern.length - 1 && pattern[row + 1][col];
+      }
+      case DIRECTION.EAST: {
+        return pattern[row][col + 1];
+      }
+      case DIRECTION.WEST: {
+        return pattern[row][col - 1];
+      }
+      default:
+        return pattern[row][col];
+    }
+  }
+
+  function getPatternForDirection(direction) {
+    let pattern = getPattern();
+    let newPattern = _.cloneDeep(pattern);
+    for (let row = 0; row < height; row++) {
+      for (let col = 0; col < width; col++) {
+        let frontStitch = getFrontStitchForDirection(
+          direction,
+          row,
+          col,
+          pattern
+        );
+        if (frontStitch && frontStitch.type === RAISED) {
+          newPattern[row][col].colour = frontStitch.colour;
+        }
+      }
+    }
+
+    let transpose = (arr) => arr[0].map((_, i) => arr.map((row) => row[i]));
+
+    switch (direction) {
+      case DIRECTION.NORTH: {
+        newPattern.forEach((row) => row.reverse());
+        newPattern.reverse();
+        break;
+      }
+      case DIRECTION.WEST: {
+        newPattern = transpose(newPattern);
+
+        newPattern.reverse();
+        break;
+      }
+      case DIRECTION.EAST: {
+        newPattern = transpose(newPattern);
+        newPattern.forEach((row) => row.reverse());
+        break;
+      }
+    }
+    return newPattern;
+  }
+
   return (
     <div>
       <h1>Pattern Editor/Visualizer</h1>
-      <div style={{ marginTop: 20 }}>
-        <TextField
-          style={styles.textField}
-          id="height"
-          label="Rows"
-          variant="outlined"
-          defaultValue={HEIGHT}
-          onBlur={handleChangeHeight}
-        />
-        <TextField
-          style={styles.textField}
-          id="width"
-          label="Stitches per Row"
-          variant="outlined"
-          defaultValue={WIDTH}
-          onBlur={handleChangeWidth}
-        />
-      </div>
-      <FormControl>
-        <FormLabel id="demo-row-radio-buttons-group-label">
-          Stitch Type
-        </FormLabel>
-        <RadioGroup
-          row
-          name="row-radio-buttons-group"
-          value={stitchType}
-          onChange={(e) => setStitchType(parseInt(e.target.value))}
-        >
-          <FormControlLabel value={TOGGLE} control={<Radio />} label="Toggle" />
-          <FormControlLabel value={RAISED} control={<Radio />} label="Raised" />
-          <FormControlLabel value={FLAT} control={<Radio />} label="Flat" />
-        </RadioGroup>
-      </FormControl>
-      <CompactPicker
-        color={selectedColor}
-        onChangeComplete={(color) => setSelectedColor(color.hex)}
+      <OptionEditor
+        colour={colour}
+        height={height}
+        stitchType={stitchType}
+        width={width}
+        setColour={setColour}
+        setStitchType={setStitchType}
+        handleResize={handleResize}
       />
-      <div>
-        <button type="button" onClick={handleUndo}>
-          Undo
-        </button>
-      </div>
-      <div style={{ display: "flex", marginTop: 10 }} className="App">
-        <DrawingPanel
-          style={{ float: "left" }}
-          pattern={getPattern()}
-          updatePixel={updatePixel}
-          updateRow={updateRow}
-          updateCol={updateCol}
-          title={"Editor"}
-        />
-        {false && (
-          <div id="all-viewers">
-            <ViewerGroup
-              style={{
-                margin: 0,
-                height: "50vh",
-                width: "40vw",
-                overflow: "scroll",
-                float: "right",
-              }}
-              pattern={getPattern()}
-            />
-          </div>
-        )}
-      </div>
-      <Text pattern={getPattern()} handleLoadPattern={handleLoadPattern} />
+      <StitchGrid
+        label="TOP"
+        pattern={getPattern()}
+        updatePixel={updatePixel}
+        updateCol={updateCol}
+        updateRow={updateRow}
+      />
+      <StitchGrid
+        label="NORTH"
+        pattern={getPatternForDirection(DIRECTION.NORTH)}
+        viewOnly
+      />
+      <StitchGrid
+        label="SOUTH"
+        pattern={getPatternForDirection(DIRECTION.SOUTH)}
+        viewOnly
+      />
+      <StitchGrid
+        label="EAST"
+        pattern={getPatternForDirection(DIRECTION.EAST)}
+        viewOnly
+      />
+      <StitchGrid
+        label="WEST"
+        pattern={getPatternForDirection(DIRECTION.WEST)}
+        viewOnly
+      />
     </div>
   );
 }
-
-const styles = {
-  optionsContainer: { display: "flex" },
-  textField: { padding: 10 },
-};
