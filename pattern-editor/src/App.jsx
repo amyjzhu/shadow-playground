@@ -81,19 +81,7 @@ export default function App() {
     pushPattern(newPattern);
   }
 
-<<<<<<< HEAD
-  function updatePixelSpecific(row, col, type, colour = selectedColor) {
-    let newPattern = _.cloneDeep(getPattern());
-    newPattern[row][col].color = colour;
-
-    newPattern[row][col].type = type;
-    pushPattern(newPattern);
-  }
-
-  function updateRow(i) {
-=======
   function updateRow(row) {
->>>>>>> master
     let newPattern = _.cloneDeep(getPattern());
     newPattern[row].forEach((stitch) => {
       stitch.colour = colour;
@@ -242,52 +230,6 @@ export default function App() {
         pattern={getPatternForDirection(DIRECTION.WEST)}
         viewOnly
       />
-<<<<<<< HEAD
-      <div>
-        <button type="button" onClick={handleUndo}>
-          Undo
-        </button>
-      </div>
-      <div style={{ display: "flex", marginTop: 10 }} className="App">
-        <DrawingPanel
-          style={{ float: "left" }}
-          pattern={getPattern()}
-          updatePixel={updatePixel}
-          updateRow={updateRow}
-          updateCol={updateCol}
-          title={"Editor"}
-        />
-        <ViewEditorGroup
-          style={{
-            margin: 0,
-            height: "50vh",
-            width: "40vw",
-            overflow: "scroll",
-            float: "right",
-          }}
-          pattern={getPattern()}
-          updatePixelSpecific={updatePixelSpecific}
-          selectedColor={selectedColor}
-          title={"Viewer"}
-        />
-        
-          {/* <div id="all-viewers">
-            <ViewerGroup
-              style={{
-                margin: 0,
-                height: "50vh",
-                width: "40vw",
-                overflow: "scroll",
-                float: "right",
-              }}
-              pattern={getPattern()}
-            />
-          </div> */}
-        
-      </div>
-      <Text pattern={getPattern()} handleLoadPattern={handleLoadPattern} />
-=======
->>>>>>> master
     </div>
   );
 }
