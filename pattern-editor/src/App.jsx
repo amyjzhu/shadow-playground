@@ -15,14 +15,6 @@ import {
   TOGGLE,
   FLAT,
 } from "./constants";
-<<<<<<< HEAD
-import "./styles/App.scss";
-import DrawingPanel from "./DrawingPanel";
-import ViewerGroup from "./ViewerGroup";
-import ViewEditorGroup from "./ViewEditorGroup";
-import Text from "./Text";
-=======
->>>>>>> master
 
 export default function App() {
   let defaultPattern = [];
