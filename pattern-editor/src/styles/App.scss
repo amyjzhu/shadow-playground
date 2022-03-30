@@ -19,6 +19,11 @@ body {
   min-width: fit-content;
 }
 
+.stitch-grid {
+  display: inline-block;
+  padding: 10px;
+}
+
 .drawingPanel {
   display: flex;
   flex-direction: column;
