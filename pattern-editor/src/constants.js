@@ -17,7 +17,7 @@ export const DIRECTION = {
   WEST: "WEST",
 };
 
-export const DEFAULT_STITCH = { colour: WHITE, type: FLAT };
+export const DEFAULT_STITCH = { colour: GRAY, type: FLAT };
 
 export const STITCH_CASES = [
   { colour: BLACK, type: RAISED },
