@@ -49,9 +49,11 @@ export default function HeuristicEditor() {
             <td colSpan="2">Output</td>
           </tr>
           <tr style={{ borderBottom: "1px solid black" }}>
-            <td>Stitch</td>
-            <td className="border">Front</td>
-            <td>Stitch</td>
+            <td style={{ padding: "0px 8px" }}>Target</td>
+            <td className="border" style={{ padding: "0px 8px" }}>
+              Front
+            </td>
+            <td>Target</td>
             <td>Front</td>
           </tr>
           {cases.map((c, i) => (
