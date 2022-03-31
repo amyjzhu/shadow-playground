@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Select, { components } from "react-select";
 
 import { BLACK, GRAY, RAISED, STITCH_CASES } from "./constants";
@@ -26,6 +26,7 @@ function getIconForStitch(stitchString) {
 
 export default function HeuristicEditor(props) {
   const { map, onUpdateHeuristic } = props;
+  let [isOpen, setIsOpen] = useState(false);
 
   const cases = [];
   Object.keys(map).forEach((key) => {
@@ -48,68 +49,77 @@ export default function HeuristicEditor(props) {
 
   return (
     <div>
-      <table style={{ margin: "auto", marginTop: 20 }}>
-        <tbody>
-          <tr>
-            <td className="border" colSpan="2">
-              Input
-            </td>
-            <td colSpan="2">Output</td>
-          </tr>
-          <tr style={{ borderBottom: "1px solid black" }}>
-            <td style={{ padding: "0px 8px" }}>Target</td>
-            <td className="border" style={{ padding: "0px 8px" }}>
-              Front
-            </td>
-            <td>Target</td>
-            <td>Front</td>
-          </tr>
-          {cases.map((c, i) => (
-            <tr key={i}>
-              <td>{getIconForStitch(c.before.target)}</td>
-              <td className="border">{getIconForStitch(c.before.front)}</td>
-              <td>
-                <Select
-                  options={options}
-                  onChange={(opt) =>
-                    onUpdateHeuristic(
-                      `${c.before.target}:${c.before.front}`,
-                      `${opt.value}:${c.after.front}`
-                    )
-                  }
-                  value={{
-                    value: c.after.target,
-                    label: c.after.target,
-                  }}
-                  components={{
-                    Option: IconOption,
-                    ValueContainer: IconValueContainer,
-                  }}
-                />
+      <h3 style={{ cursor: "pointer" }} onClick={() => setIsOpen(!isOpen)}>
+        Open Heuristic Editor{" "}
+        <i
+          style={{ paddingTop: 5 }}
+          className={`fa fa-angle-${isOpen ? "down" : "right"}`}
+        ></i>
+      </h3>
+      {isOpen && (
+        <table style={{ margin: "auto", marginTop: 20 }}>
+          <tbody>
+            <tr>
+              <td className="border" colSpan="2">
+                Input
               </td>
-              <td>
-                <Select
-                  options={options}
-                  onChange={(opt) =>
-                    onUpdateHeuristic(
-                      `${c.before.target}:${c.before.front}`,
-                      `${c.after.target}:${opt.value}`
-                    )
-                  }
-                  value={{
-                    value: c.after.front,
-                    label: c.after.front,
-                  }}
-                  components={{
-                    Option: IconOption,
-                    ValueContainer: IconValueContainer,
-                  }}
-                />
-              </td>
+              <td colSpan="2">Output</td>
             </tr>
-          ))}
-        </tbody>
-      </table>
+            <tr style={{ borderBottom: "1px solid black" }}>
+              <td style={{ padding: "0px 8px" }}>Target</td>
+              <td className="border" style={{ padding: "0px 8px" }}>
+                Front
+              </td>
+              <td>Target</td>
+              <td>Front</td>
+            </tr>
+            {cases.map((c, i) => (
+              <tr key={i}>
+                <td>{getIconForStitch(c.before.target)}</td>
+                <td className="border">{getIconForStitch(c.before.front)}</td>
+                <td>
+                  <Select
+                    options={options}
+                    onChange={(opt) =>
+                      onUpdateHeuristic(
+                        `${c.before.target}:${c.before.front}`,
+                        `${opt.value}:${c.after.front}`
+                      )
+                    }
+                    value={{
+                      value: c.after.target,
+                      label: c.after.target,
+                    }}
+                    components={{
+                      Option: IconOption,
+                      ValueContainer: IconValueContainer,
+                    }}
+                  />
+                </td>
+                <td>
+                  <Select
+                    options={options}
+                    onChange={(opt) =>
+                      onUpdateHeuristic(
+                        `${c.before.target}:${c.before.front}`,
+                        `${c.after.target}:${opt.value}`
+                      )
+                    }
+                    value={{
+                      value: c.after.front,
+                      label: c.after.front,
+                    }}
+                    components={{
+                      Option: IconOption,
+                      ValueContainer: IconValueContainer,
+                    }}
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   );
 }
