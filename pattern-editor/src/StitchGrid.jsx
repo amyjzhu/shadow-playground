@@ -1,5 +1,5 @@
 import React from "react";
-import { FLAT, GRAY, WHITE } from "./constants";
+import { FLAT, GRAY } from "./constants";
 import Pixel from "./Pixel";
 
 export default function StitchGrid(props) {

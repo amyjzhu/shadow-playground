@@ -179,6 +179,9 @@ export default function App() {
         newPattern.forEach((row) => row.reverse());
         break;
       }
+      default: {
+        break;
+      }
     }
     return newPattern;
   }

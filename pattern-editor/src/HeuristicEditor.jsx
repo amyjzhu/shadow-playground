@@ -1,7 +1,7 @@
 import React from "react";
 import Select, { components } from "react-select";
 
-import { BLACK, RAISED, STITCH_CASES } from "./constants";
+import { RAISED, STITCH_CASES } from "./constants";
 
 // Customize react-select components to display icons in the dropdown
 const { Option, ValueContainer } = components;
