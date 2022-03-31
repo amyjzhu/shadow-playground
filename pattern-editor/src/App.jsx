@@ -3,6 +3,7 @@ import _ from "lodash";
 import { useHotkeys } from "react-hotkeys-hook";
 
 import "./styles/App.scss";
+import HeuristicEditor from "./HeuristicEditor";
 import OptionEditor from "./OptionEditor";
 import StitchGrid from "./StitchGrid";
 import {
@@ -194,6 +195,7 @@ export default function App() {
         setStitchType={setStitchType}
         handleResize={handleResize}
       />
+      <HeuristicEditor />
       <StitchGrid
         label="TOP"
         pattern={getPattern()}
