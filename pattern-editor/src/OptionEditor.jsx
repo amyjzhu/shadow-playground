@@ -9,22 +9,7 @@ import TextField from "@material-ui/core/TextField";
 
 import { HEIGHT, WIDTH, TOGGLE, RAISED, FLAT } from "./constants";
 
-//TODO: hook these up to state
 export default function OptionEditor(props) {
-  function handleChangeHeight(e) {
-    const newHeight = parseInt(e.target.value);
-    if (newHeight) {
-      props.setHeight(newHeight);
-    }
-  }
-
-  function handleChangeWidth(e) {
-    const newWidth = parseInt(e.target.value);
-    if (newWidth) {
-      props.setWidth(newWidth);
-    }
-  }
-
   return (
     <div>
       <div>
