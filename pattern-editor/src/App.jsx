@@ -77,6 +77,7 @@ export default function App() {
   }
 
   function updatePixel(row, col) {
+    console.log("edit made at " + row + ", " + col);
     let newPattern = _.cloneDeep(getPattern());
     let oldPattern = getPattern();
     newPattern[row][col].colour = colour;
@@ -123,6 +124,37 @@ export default function App() {
     pushPattern(newPattern);
   }
 
+  // the idea is that you want to make the pixel in that view that colour
+  // eventually we should use rules to make this modification 
+  // but for now we just apply the settings chosen in OptionEditor
+  function updateForDirection(direction) {
+    // delicious curry 
+    return (viewRow, viewCol) => {
+      let newPattern = _.cloneDeep(getPattern());
+      let oldPattern = getPattern();
+      
+      console.log(getCanonicalPixelFromDirection(direction, viewRow, viewCol, oldPattern));
+      let {row, col} = getCanonicalPixelFromDirection(direction, viewRow, viewCol, oldPattern);
+      console.log(row);
+      console.log(col);
+      console.log(newPattern[row]);
+
+      newPattern[row][col].colour = colour;
+      let newType;
+      if (stitchType === TOGGLE) {
+        if (oldPattern[row][col].type === RAISED) {
+          newType = FLAT;
+        } else {
+          newType = RAISED;
+        }
+      } else {
+        newType = stitchType;
+      }
+      newPattern[row][col].type = newType;
+      pushPattern(newPattern);
+    }
+  }
+
   function handleResize(newHeight, newWidth) {
     if (!newHeight || !newWidth) {
       return;
@@ -143,6 +175,32 @@ export default function App() {
     setWidth(newWidth);
     setHeight(newHeight);
     pushPattern(newPattern);
+  }
+
+  function getCanonicalPixelFromDirection(direction, row, col, pattern) {
+    let maxRow = pattern.length - 1;
+    let maxCol = pattern[0].length - 1;
+    
+    switch (direction) {
+      case DIRECTION.NORTH: {
+        // normally it would be pattern[x][y]
+        // with north, we are completely opposite
+        return {col: maxCol - col, row: maxRow - row};
+      }
+      case DIRECTION.SOUTH: {
+        return {col: col, row: row};
+      }
+      case DIRECTION.EAST: {
+        // order is preserved for the y direction 
+        return {col: row, row: maxCol - col};
+      }
+      case DIRECTION.WEST: {
+        // order is preserved for the x direction
+        return {col: maxRow - row, row: col};
+      }
+      default:
+        return {col: col, row: row};
+    }
   }
 
   function getFrontStitchForDirection(direction, row, col, pattern) {
@@ -233,22 +291,30 @@ export default function App() {
       <StitchGrid
         label="NORTH"
         pattern={getPatternForDirection(DIRECTION.NORTH)}
-        viewOnly
+        updatePixel={updateForDirection(DIRECTION.NORTH)}
+        updateCol={updateCol}
+        updateRow={updateRow}
       />
       <StitchGrid
         label="SOUTH"
         pattern={getPatternForDirection(DIRECTION.SOUTH)}
-        viewOnly
+        updatePixel={updateForDirection(DIRECTION.SOUTH)}
+        updateCol={updateCol}
+        updateRow={updateRow}
       />
       <StitchGrid
         label="EAST"
         pattern={getPatternForDirection(DIRECTION.EAST)}
-        viewOnly
+        updatePixel={updateForDirection(DIRECTION.EAST)}
+        updateCol={updateCol}
+        updateRow={updateRow}
       />
       <StitchGrid
         label="WEST"
         pattern={getPatternForDirection(DIRECTION.WEST)}
-        viewOnly
+        updatePixel={updateForDirection(DIRECTION.WEST)}
+        updateCol={updateCol}
+        updateRow={updateRow}
       />
     </div>
   );
