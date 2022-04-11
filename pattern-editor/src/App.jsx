@@ -29,6 +29,21 @@ export default function App() {
   let [colour, setColour] = useState(WHITE);
   let [width, setWidth] = useState(WIDTH);
   let [height, setHeight] = useState(HEIGHT);
+  let [weights, setWeights] = useState(
+    Object.keys(DIRECTION).reduce((weights, dir) => {
+      weights[dir] = 1;
+      return weights;
+    }, {})
+  );
+
+  function handleWeightChange(dir) {
+    return function (e) {
+      const newWeight = parseInt(e.target.value) || 0;
+      let newWeights = { ...weights };
+      newWeights[dir] = newWeight;
+      setWeights(newWeights);
+    };
+  }
 
   useHotkeys("cmd+z", handleUndo, {}, [patternStack]);
 
@@ -143,15 +158,7 @@ export default function App() {
         opt(patternCopy, row, col);
         const viewPattern = getPatternForDirection(patternCopy, direction);
         if (viewPattern[viewRow][viewCol].colour === targetColour) {
-          const otherViews = [DIRECTION.NORTH, DIRECTION.SOUTH];
-          let optCost = 0;
-          otherViews.forEach((otherDir) => {
-            optCost += computeCost(
-              getPatternForDirection(patternCopy, otherDir),
-              getPatternForDirection(oldPattern, otherDir)
-            );
-          });
-          console.log(optCost);
+          let optCost = computeCost(patternCopy, direction);
           if (optCost < cost) {
             cost = optCost;
             best = patternCopy;
@@ -166,15 +173,22 @@ export default function App() {
     };
   }
 
-  function computeCost(pat1, pat2) {
+  function computeCost(modifiedPattern, targetDirection) {
     let cost = 0;
-    pat1.forEach((row, i) => {
-      row.forEach((stitch, j) => {
-        if (stitch.colour !== pat2[i][j].colour) {
-          cost++;
-        }
+    Object.keys(DIRECTION).forEach((dir) => {
+      let weight = weights[dir];
+      let original = getPatternForDirection(getPattern(), dir);
+      let updated = getPatternForDirection(modifiedPattern, dir);
+      original.forEach((row, i) => {
+        row.forEach((stitch, j) => {
+          if (stitch.colour !== updated[i][j].colour) {
+            cost += weight;
+          }
+        });
       });
     });
+    // subtract out the cost of the stitch you're trying to change
+    cost -= weights[targetDirection];
     return cost;
   }
 
@@ -291,6 +305,8 @@ export default function App() {
         width={width}
         setColour={setColour}
         handleResize={handleResize}
+        weights={weights}
+        handleWeightChange={handleWeightChange}
       />
       <StitchGrid
         label="TOP"
