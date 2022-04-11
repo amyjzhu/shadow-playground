@@ -100,19 +100,19 @@ export default function App() {
       let frontOptions = [
         (pattern, i, j) => {
           const { r, c } = getFrontCoords(direction, i, j);
-          if (pattern[r][c]) {
+          if (pattern[r] && pattern[r][c]) {
             pattern[r][c].type = toggle(pattern[r][c].type);
           }
         }, // change stitch type
         (pattern, i, j) => {
           const { r, c } = getFrontCoords(direction, i, j);
-          if (pattern[r][c]) {
+          if (pattern[r] && pattern[r][c]) {
             pattern[r][c].colour = targetColour;
           }
         }, // change colour
         (pattern, i, j) => {
           const { r, c } = getFrontCoords(direction, i, j);
-          if (pattern[r][c]) {
+          if (pattern[r] && pattern[r][c]) {
             pattern[r][c].type = toggle(pattern[r][c].type);
             pattern[r][c].colour = targetColour;
           }
