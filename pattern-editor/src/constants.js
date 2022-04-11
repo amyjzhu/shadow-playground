@@ -17,10 +17,3 @@ export const DIRECTION = {
 };
 
 export const DEFAULT_STITCH = { colour: GRAY, type: FLAT };
-
-export const STITCH_CASES = [
-  { colour: BLACK, type: RAISED },
-  { colour: BLACK, type: FLAT },
-  { colour: GRAY, type: RAISED },
-  { colour: GRAY, type: FLAT },
-];

@@ -3,7 +3,6 @@ import _ from "lodash";
 import { useHotkeys } from "react-hotkeys-hook";
 
 import "./styles/App.scss";
-import HeuristicEditor from "./HeuristicEditor";
 import OptionEditor from "./OptionEditor";
 import StitchGrid from "./StitchGrid";
 import {
@@ -13,10 +12,8 @@ import {
   DIRECTION,
   WHITE,
   RAISED,
-  STITCH_CASES,
   FLAT,
 } from "./constants";
-import * as utils from "./utils";
 
 export default function App() {
   let defaultPattern = [];
@@ -27,32 +24,13 @@ export default function App() {
     }
     defaultPattern.push(patternRow);
   }
-  let defaultHeuristicMap = {};
-  STITCH_CASES.forEach((targetStitch) => {
-    STITCH_CASES.forEach((frontStitch) => {
-      defaultHeuristicMap[
-        `${utils.hackySerialize(targetStitch)}:${utils.hackySerialize(
-          frontStitch
-        )}`
-      ] = `${utils.hackySerialize(DEFAULT_STITCH)}:${utils.hackySerialize(
-        DEFAULT_STITCH
-      )}`;
-    });
-  });
 
   let [patternStack, setPatternStack] = useState([defaultPattern]);
-  let [heuristicMap, setHeuristicMap] = useState(defaultHeuristicMap);
   let [colour, setColour] = useState(WHITE);
   let [width, setWidth] = useState(WIDTH);
   let [height, setHeight] = useState(HEIGHT);
 
   useHotkeys("cmd+z", handleUndo, {}, [patternStack]);
-
-  function handleChangeHeuristic(key, value) {
-    let newHeuristicMap = _.cloneDeep(heuristicMap);
-    newHeuristicMap[key] = value;
-    setHeuristicMap(newHeuristicMap);
-  }
 
   function getPattern() {
     return patternStack[0];
@@ -313,10 +291,6 @@ export default function App() {
         width={width}
         setColour={setColour}
         handleResize={handleResize}
-      />
-      <HeuristicEditor
-        map={heuristicMap}
-        onUpdateHeuristic={handleChangeHeuristic}
       />
       <StitchGrid
         label="TOP"
