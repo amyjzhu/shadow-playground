@@ -30,7 +30,7 @@ export default function StitchGrid(props) {
         )}
         {props.pattern.map((row, i) => (
           <div className="row" key={i}>
-            {props.updateRow && (
+            {updateRow && (
               <Pixel
                 rowArrow
                 colour={GRAY}
