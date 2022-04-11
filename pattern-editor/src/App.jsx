@@ -303,32 +303,24 @@ export default function App() {
         label="NORTH"
         pattern={getPatternForDirection(getPattern(), DIRECTION.NORTH)}
         updatePixel={minimizeDiff(DIRECTION.NORTH)}
-        updateCol={updateCol}
-        updateRow={updateRow}
         allFlat
       />
       <StitchGrid
         label="SOUTH"
         pattern={getPatternForDirection(getPattern(), DIRECTION.SOUTH)}
         updatePixel={minimizeDiff(DIRECTION.SOUTH)}
-        updateCol={updateCol}
-        updateRow={updateRow}
         allFlat
       />
       <StitchGrid
         label="EAST"
         pattern={getPatternForDirection(getPattern(), DIRECTION.EAST)}
         updatePixel={minimizeDiff(DIRECTION.EAST)}
-        updateCol={updateCol}
-        updateRow={updateRow}
         allFlat
       />
       <StitchGrid
         label="WEST"
         pattern={getPatternForDirection(getPattern(), DIRECTION.WEST)}
         updatePixel={minimizeDiff(DIRECTION.WEST)}
-        updateCol={updateCol}
-        updateRow={updateRow}
         allFlat
       />
     </div>

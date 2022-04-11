@@ -3,11 +3,13 @@ import { FLAT, GRAY } from "./constants";
 import Pixel from "./Pixel";
 
 export default function StitchGrid(props) {
+  const updateRow = props.updateRow && !props.viewOnly;
+  const updateCol = props.updateCol && !props.viewOnly;
   return (
     <div className="stitch-grid">
       <h2>{props.label}</h2>
       <div className="pixels">
-        {!props.viewOnly && (
+        {updateCol && (
           <div className="row">
             <Pixel
               colour={GRAY}
@@ -28,7 +30,7 @@ export default function StitchGrid(props) {
         )}
         {props.pattern.map((row, i) => (
           <div className="row" key={i}>
-            {!props.viewOnly && (
+            {props.updateRow && (
               <Pixel
                 rowArrow
                 colour={GRAY}
