@@ -40,7 +40,7 @@ export default function StitchGrid(props) {
               <Pixel
                 key={j}
                 colour={props.pattern[i][j].colour}
-                stitchType={props.pattern[i][j].type}
+                stitchType={props.allFlat ? FLAT : props.pattern[i][j].type}
                 onChange={() => props.updatePixel(i, j)}
                 viewOnly={props.viewOnly}
               />
