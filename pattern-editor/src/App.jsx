@@ -71,6 +71,20 @@ export default function App() {
     let copy = _.cloneDeep(batchedChanges);
     copy.unshift({ direction, viewRow, viewCol });
     setBatchedChanges(copy);
+
+  function applyBatchedChanges() {
+    let pattern = getPattern();
+    batchedChanges.forEach((change) => {
+      // TODO: Do something smarter than sequentially applying changes
+      pattern = minimizeDiff(
+        pattern,
+        change.direction,
+        change.viewRow,
+        change.viewCol
+      );
+    });
+    pushPattern(pattern);
+    setBatchedChanges([]);
   }
 
   function handleWeightChange(dir) {
@@ -134,20 +148,6 @@ export default function App() {
       stitch.type = toggle(stitch.type);
     });
     pushPattern(newPattern);
-  }
-
-  function applyBatchedChanges() {
-    let pattern = getPattern();
-    batchedChanges.forEach((change) => {
-      pattern = minimizeDiff(
-        pattern,
-        change.direction,
-        change.viewRow,
-        change.viewCol
-      );
-    });
-    pushPattern(pattern);
-    setBatchedChanges([]);
   }
 
   function minimizeDiff(oldPattern, direction, viewRow, viewCol) {
