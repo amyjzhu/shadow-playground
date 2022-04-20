@@ -58,20 +58,23 @@ export default function App() {
     return newPattern;
   }
 
-  function pushBatchChange(direction, viewRow, viewCol) {
-    let { row, col } = getCanonicalPixelFromDirection(
-      direction,
-      viewRow,
-      viewCol,
-      getPattern()
-    );
-    let newPendingPattern = getPendingPattern(direction);
-    newPendingPattern[row][col].colour = colour;
-    setPendingPattern(newPendingPattern);
+  function updateViewPixel(direction) {
+    return function (viewRow, viewCol) {
+      let { row, col } = getCanonicalPixelFromDirection(
+        direction,
+        viewRow,
+        viewCol,
+        getPattern()
+      );
+      let newPendingPattern = getPendingPattern(direction);
+      newPendingPattern[row][col].colour = colour;
+      setPendingPattern(newPendingPattern);
 
-    let copy = _.cloneDeep(batchedChanges);
-    copy.unshift({ direction, viewRow, viewCol });
-    setBatchedChanges(copy);
+      let copy = _.cloneDeep(batchedChanges);
+      copy.unshift({ direction, viewRow, viewCol });
+      setBatchedChanges(copy);
+    };
+  }
 
   function applyBatchedChanges() {
     let pattern = getPattern();
@@ -123,7 +126,7 @@ export default function App() {
     return stitchType === RAISED ? FLAT : RAISED;
   }
 
-  function updatePixel(row, col) {
+  function updateTopPixel(row, col) {
     console.log("edit made at " + row + ", " + col);
     let newPattern = _.cloneDeep(getPattern());
     let oldPattern = getPattern();
@@ -374,7 +377,7 @@ export default function App() {
       <StitchGrid
         label="TOP"
         pattern={getPattern()}
-        updatePixel={updatePixel}
+        updatePixel={updateTopPixel}
         updateCol={updateCol}
         updateRow={updateRow}
         canEdit={canEdit(DIRECTION.TOP)}
@@ -382,28 +385,28 @@ export default function App() {
       <StitchGrid
         label="NORTH"
         pattern={getPatternView(DIRECTION.NORTH)}
-        updatePixel={(row, col) => pushBatchChange(DIRECTION.NORTH, row, col)}
+        updatePixel={updateViewPixel(DIRECTION.NORTH)}
         allFlat
         canEdit={canEdit(DIRECTION.NORTH)}
       />
       <StitchGrid
         label="SOUTH"
         pattern={getPatternView(DIRECTION.SOUTH)}
-        updatePixel={(row, col) => pushBatchChange(DIRECTION.SOUTH, row, col)}
+        updatePixel={updateViewPixel(DIRECTION.SOUTH)}
         allFlat
         canEdit={canEdit(DIRECTION.SOUTH)}
       />
       <StitchGrid
         label="EAST"
         pattern={getPatternView(DIRECTION.EAST)}
-        updatePixel={(row, col) => pushBatchChange(DIRECTION.EAST, row, col)}
+        updatePixel={updateViewPixel(DIRECTION.EAST)}
         allFlat
         canEdit={canEdit(DIRECTION.EAST)}
       />
       <StitchGrid
         label="WEST"
         pattern={getPatternView(DIRECTION.WEST)}
-        updatePixel={(row, col) => pushBatchChange(DIRECTION.WEST, row, col)}
+        updatePixel={updateViewPixel(DIRECTION.WEST)}
         allFlat
         canEdit={canEdit(DIRECTION.WEST)}
       />
