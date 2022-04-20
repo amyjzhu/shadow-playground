@@ -1,5 +1,6 @@
 import React from "react";
 import { CompactPicker } from "react-color";
+import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
 
 import { HEIGHT, WIDTH, DIRECTION } from "./constants";
@@ -76,11 +77,21 @@ export default function OptionEditor(props) {
           />
         </span>
       </div>
+      <Button
+        style={styles.button}
+        variant="outlined"
+        onClick={props.applyBatchedChanges}
+      >
+        {`Execute ${props.batchedChanges} Batched Changes`}
+      </Button>
     </div>
   );
 }
 
 const styles = {
+  button: {
+    marginTop: 20,
+  },
   textField: {
     padding: 10,
   },

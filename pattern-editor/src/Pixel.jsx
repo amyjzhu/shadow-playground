@@ -8,6 +8,7 @@ export default function Pixel(props) {
   return (
     <div
       style={{
+        opacity: viewOnly ? 0.5 : 1,
         backgroundColor: colour,
         border: "1px solid #D3D3D3",
         cursor: viewOnly ? "default" : "pointer",
@@ -21,7 +22,7 @@ export default function Pixel(props) {
       {colArrow && (
         <i style={{ paddingTop: 5 }} className="fa fa-angle-down"></i>
       )}
-      {!viewOnly && stitchType === RAISED && (
+      {stitchType === RAISED && (
         <i
           style={{ color: dotColour, paddingTop: 5, fontSize: 8 }}
           className="fa fa-circle"
