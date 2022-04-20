@@ -44,6 +44,7 @@ export default function App() {
     }
     let pattern = getPattern();
     let newPattern = _.cloneDeep(pattern);
+    // TODO: maybe deduplicate with getPatternForDirection?
     for (let row = 0; row < height; row++) {
       for (let col = 0; col < width; col++) {
         let { r, c } = getFrontCoords(direction, row, col);
@@ -367,7 +368,7 @@ export default function App() {
         handleResize={handleResize}
         weights={weights}
         handleWeightChange={handleWeightChange}
-        batchedChanges={batchedChanges.length}
+        numBatchedChanges={batchedChanges.length}
         applyBatchedChanges={applyBatchedChanges}
       />
       <StitchGrid
