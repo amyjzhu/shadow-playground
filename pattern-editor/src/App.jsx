@@ -376,35 +376,35 @@ export default function App() {
         updatePixel={updatePixel}
         updateCol={updateCol}
         updateRow={updateRow}
-        viewOnly={!canEdit(DIRECTION.TOP)}
+        canEdit={canEdit(DIRECTION.TOP)}
       />
       <StitchGrid
         label="NORTH"
         pattern={getPatternView(DIRECTION.NORTH)}
         updatePixel={(row, col) => pushBatchChange(DIRECTION.NORTH, row, col)}
         allFlat
-        viewOnly={!canEdit(DIRECTION.NORTH)}
+        canEdit={canEdit(DIRECTION.NORTH)}
       />
       <StitchGrid
         label="SOUTH"
         pattern={getPatternView(DIRECTION.SOUTH)}
         updatePixel={(row, col) => pushBatchChange(DIRECTION.SOUTH, row, col)}
         allFlat
-        viewOnly={!canEdit(DIRECTION.SOUTH)}
+        canEdit={canEdit(DIRECTION.SOUTH)}
       />
       <StitchGrid
         label="EAST"
         pattern={getPatternView(DIRECTION.EAST)}
         updatePixel={(row, col) => pushBatchChange(DIRECTION.EAST, row, col)}
         allFlat
-        viewOnly={!canEdit(DIRECTION.EAST)}
+        canEdit={canEdit(DIRECTION.EAST)}
       />
       <StitchGrid
         label="WEST"
         pattern={getPatternView(DIRECTION.WEST)}
         updatePixel={(row, col) => pushBatchChange(DIRECTION.WEST, row, col)}
         allFlat
-        viewOnly={!canEdit(DIRECTION.WEST)}
+        canEdit={canEdit(DIRECTION.WEST)}
       />
     </div>
   );

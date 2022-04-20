@@ -16,7 +16,7 @@ export default function StitchGrid(props) {
               stitchType={FLAT}
               key={-1}
               onChange={() => {}}
-              viewOnly={props.viewOnly}
+              canEdit={props.canEdit}
             />
             {props.pattern[0].map((_, j) => (
               <Pixel
@@ -25,7 +25,7 @@ export default function StitchGrid(props) {
                 stitchType={FLAT}
                 key={j}
                 onChange={() => props.updateCol(j)}
-                viewOnly={props.viewOnly}
+                canEdit={props.canEdit}
               />
             ))}
           </div>
@@ -38,7 +38,7 @@ export default function StitchGrid(props) {
                 colour={GRAY}
                 stitchType={FLAT}
                 onChange={() => props.updateRow(i)}
-                viewOnly={props.viewOnly}
+                canEdit={props.canEdit}
               />
             )}
             {row.map((pixel, j) => (
@@ -47,7 +47,7 @@ export default function StitchGrid(props) {
                 colour={props.pattern[i][j].colour}
                 stitchType={props.allFlat ? FLAT : props.pattern[i][j].type}
                 onChange={() => props.updatePixel(i, j)}
-                viewOnly={props.viewOnly}
+                canEdit={props.canEdit}
               />
             ))}
           </div>
