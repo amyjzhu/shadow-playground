@@ -81,8 +81,11 @@ export default function OptionEditor(props) {
         style={styles.button}
         variant="outlined"
         onClick={props.applyBatchedChanges}
+        disabled={props.numBatchedChanges === 0}
       >
-        {`Execute ${props.numBatchedChanges} Batched Changes`}
+        {`Execute ${props.numBatchedChanges} Batched Change${
+          props.numBatchedChanges === 1 ? "" : "s"
+        }`}
       </Button>
     </div>
   );

@@ -71,7 +71,7 @@ export default function App() {
       setPendingPattern(newPendingPattern);
 
       let copy = _.cloneDeep(batchedChanges);
-      copy.unshift({ direction, viewRow, viewCol });
+      copy.unshift({ direction, viewRow, viewCol, colour });
       setBatchedChanges(copy);
     };
   }
@@ -84,7 +84,8 @@ export default function App() {
         pattern,
         change.direction,
         change.viewRow,
-        change.viewCol
+        change.viewCol,
+        change.colour
       );
     });
     pushPattern(pattern);
@@ -154,8 +155,7 @@ export default function App() {
     pushPattern(newPattern);
   }
 
-  function minimizeDiff(oldPattern, direction, viewRow, viewCol) {
-    let targetColour = colour;
+  function minimizeDiff(oldPattern, direction, viewRow, viewCol, targetColour) {
     let targetOptions = [
       (pattern, i, j) => (pattern[i][j].type = toggle(pattern[i][j].type)), // change stitch type
       (pattern, i, j) => (pattern[i][j].colour = targetColour), // change colour
