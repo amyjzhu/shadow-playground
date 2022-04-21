@@ -3,11 +3,11 @@ import { FLAT, GRAY } from "./constants";
 import Pixel from "./Pixel";
 
 export default function StitchGrid(props) {
-  const updateRow = props.updateRow && !props.viewOnly;
-  const updateCol = props.updateCol && !props.viewOnly;
+  const updateRow = props.updateRow;
+  const updateCol = props.updateCol;
   return (
     <div className="stitch-grid">
-      <h2>{props.label}</h2>
+      <h2 style={{ marginTop: 0 }}>{props.label}</h2>
       <div className="pixels">
         {updateCol && (
           <div className="row">
@@ -16,6 +16,7 @@ export default function StitchGrid(props) {
               stitchType={FLAT}
               key={-1}
               onChange={() => {}}
+              canEdit={props.canEdit}
             />
             {props.pattern[0].map((_, j) => (
               <Pixel
@@ -24,6 +25,7 @@ export default function StitchGrid(props) {
                 stitchType={FLAT}
                 key={j}
                 onChange={() => props.updateCol(j)}
+                canEdit={props.canEdit}
               />
             ))}
           </div>
@@ -36,6 +38,7 @@ export default function StitchGrid(props) {
                 colour={GRAY}
                 stitchType={FLAT}
                 onChange={() => props.updateRow(i)}
+                canEdit={props.canEdit}
               />
             )}
             {row.map((pixel, j) => (
@@ -44,7 +47,7 @@ export default function StitchGrid(props) {
                 colour={props.pattern[i][j].colour}
                 stitchType={props.allFlat ? FLAT : props.pattern[i][j].type}
                 onChange={() => props.updatePixel(i, j)}
-                viewOnly={props.viewOnly}
+                canEdit={props.canEdit}
               />
             ))}
           </div>

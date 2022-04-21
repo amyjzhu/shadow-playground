@@ -26,6 +26,7 @@ export default function App() {
   }
 
   let [patternStack, setPatternStack] = useState([defaultPattern]);
+  let [pendingPattern, setPendingPattern] = useState(defaultPattern);
   let [colour, setColour] = useState(WHITE);
   let [width, setWidth] = useState(WIDTH);
   let [height, setHeight] = useState(HEIGHT);
@@ -35,6 +36,61 @@ export default function App() {
       return weights;
     }, {})
   );
+  let [batchedChanges, setBatchedChanges] = useState([]);
+
+  function getPendingPattern(direction) {
+    if (batchedChanges.length > 0) {
+      return pendingPattern;
+    }
+    let pattern = getPattern();
+    let newPattern = _.cloneDeep(pattern);
+    // TODO: maybe deduplicate with getPatternForDirection?
+    for (let row = 0; row < height; row++) {
+      for (let col = 0; col < width; col++) {
+        let { r, c } = getFrontCoords(direction, row, col);
+        let frontStitch = pattern[r] && pattern[r][c];
+        if (frontStitch && frontStitch.type === RAISED) {
+          newPattern[row][col].colour = frontStitch.colour;
+        }
+        newPattern[row][col].type = FLAT;
+      }
+    }
+    return newPattern;
+  }
+
+  function updateViewPixel(direction) {
+    return function (viewRow, viewCol) {
+      let { row, col } = getCanonicalPixelFromDirection(
+        direction,
+        viewRow,
+        viewCol,
+        getPattern()
+      );
+      let newPendingPattern = getPendingPattern(direction);
+      newPendingPattern[row][col].colour = colour;
+      setPendingPattern(newPendingPattern);
+
+      let copy = _.cloneDeep(batchedChanges);
+      copy.unshift({ direction, viewRow, viewCol, colour });
+      setBatchedChanges(copy);
+    };
+  }
+
+  function applyBatchedChanges() {
+    let pattern = getPattern();
+    batchedChanges.forEach((change) => {
+      // TODO: Do something smarter than sequentially applying changes
+      pattern = minimizeDiff(
+        pattern,
+        change.direction,
+        change.viewRow,
+        change.viewCol,
+        change.colour
+      );
+    });
+    pushPattern(pattern);
+    setBatchedChanges([]);
+  }
 
   function handleWeightChange(dir) {
     return function (e) {
@@ -71,7 +127,7 @@ export default function App() {
     return stitchType === RAISED ? FLAT : RAISED;
   }
 
-  function updatePixel(row, col) {
+  function updateTopPixel(row, col) {
     console.log("edit made at " + row + ", " + col);
     let newPattern = _.cloneDeep(getPattern());
     let oldPattern = getPattern();
@@ -99,78 +155,69 @@ export default function App() {
     pushPattern(newPattern);
   }
 
-  function minimizeDiff(direction) {
-    return function (viewRow, viewCol) {
-      let oldPattern = getPattern();
-      let targetColour = colour;
-      let targetOptions = [
-        (pattern, i, j) => (pattern[i][j].type = toggle(pattern[i][j].type)), // change stitch type
-        (pattern, i, j) => (pattern[i][j].colour = targetColour), // change colour
-        (pattern, i, j) => {
-          pattern[i][j].type = toggle(pattern[i][j].type);
-          pattern[i][j].colour = targetColour;
-        }, // change both
-        (pattern, i, j) => {}, // do nothing
-      ];
-      let frontOptions = [
-        (pattern, i, j) => {
-          const { r, c } = getFrontCoords(direction, i, j);
-          if (pattern[r] && pattern[r][c]) {
-            pattern[r][c].type = toggle(pattern[r][c].type);
-          }
-        }, // change stitch type
-        (pattern, i, j) => {
-          const { r, c } = getFrontCoords(direction, i, j);
-          if (pattern[r] && pattern[r][c]) {
-            pattern[r][c].colour = targetColour;
-          }
-        }, // change colour
-        (pattern, i, j) => {
-          const { r, c } = getFrontCoords(direction, i, j);
-          if (pattern[r] && pattern[r][c]) {
-            pattern[r][c].type = toggle(pattern[r][c].type);
-            pattern[r][c].colour = targetColour;
-          }
-        }, // change both
-        (pattern, i, j) => {}, // do nothing
-      ];
-      let allOptions = [];
-      targetOptions.forEach((opt1) => {
-        frontOptions.forEach((opt2) => {
-          allOptions.push((pattern, i, j) => {
-            opt1(pattern, i, j);
-            opt2(pattern, i, j);
-          });
+  function minimizeDiff(oldPattern, direction, viewRow, viewCol, targetColour) {
+    let targetOptions = [
+      (pattern, i, j) => (pattern[i][j].type = toggle(pattern[i][j].type)), // change stitch type
+      (pattern, i, j) => (pattern[i][j].colour = targetColour), // change colour
+      (pattern, i, j) => {
+        pattern[i][j].type = toggle(pattern[i][j].type);
+        pattern[i][j].colour = targetColour;
+      }, // change both
+      (pattern, i, j) => {}, // do nothing
+    ];
+    let frontOptions = [
+      (pattern, i, j) => {
+        const { r, c } = getFrontCoords(direction, i, j);
+        if (pattern[r] && pattern[r][c]) {
+          pattern[r][c].type = toggle(pattern[r][c].type);
+        }
+      }, // change stitch type
+      (pattern, i, j) => {
+        const { r, c } = getFrontCoords(direction, i, j);
+        if (pattern[r] && pattern[r][c]) {
+          pattern[r][c].colour = targetColour;
+        }
+      }, // change colour
+      (pattern, i, j) => {
+        const { r, c } = getFrontCoords(direction, i, j);
+        if (pattern[r] && pattern[r][c]) {
+          pattern[r][c].type = toggle(pattern[r][c].type);
+          pattern[r][c].colour = targetColour;
+        }
+      }, // change both
+      (pattern, i, j) => {}, // do nothing
+    ];
+    let allOptions = [];
+    targetOptions.forEach((opt1) => {
+      frontOptions.forEach((opt2) => {
+        allOptions.push((pattern, i, j) => {
+          opt1(pattern, i, j);
+          opt2(pattern, i, j);
         });
       });
+    });
 
-      let { row, col } = getCanonicalPixelFromDirection(
-        direction,
-        viewRow,
-        viewCol,
-        oldPattern
-      );
-      let cost = 1000;
-      let best;
-      let opt_ind;
-      allOptions.forEach((opt, opt_i) => {
-        let patternCopy = _.cloneDeep(oldPattern);
-        opt(patternCopy, row, col);
-        const viewPattern = getPatternForDirection(patternCopy, direction);
-        if (viewPattern[viewRow][viewCol].colour === targetColour) {
-          let optCost = computeCost(patternCopy, direction);
-          if (optCost < cost) {
-            cost = optCost;
-            best = patternCopy;
-            opt_ind = opt_i;
-          }
+    let { row, col } = getCanonicalPixelFromDirection(
+      direction,
+      viewRow,
+      viewCol,
+      oldPattern
+    );
+    let cost = 1000;
+    let best;
+    allOptions.forEach((opt) => {
+      let patternCopy = _.cloneDeep(oldPattern);
+      opt(patternCopy, row, col);
+      const viewPattern = getPatternForDirection(patternCopy, direction);
+      if (viewPattern[viewRow][viewCol].colour === targetColour) {
+        let optCost = computeCost(patternCopy, direction);
+        if (optCost < cost) {
+          cost = optCost;
+          best = patternCopy;
         }
-      });
-      if (best) {
-        console.log(`best: ${cost}, option ${opt_ind}`);
-        pushPattern(best);
       }
-    };
+    });
+    return best;
   }
 
   function computeCost(modifiedPattern, targetDirection) {
@@ -240,6 +287,13 @@ export default function App() {
     }
   }
 
+  function canEdit(direction) {
+    if (batchedChanges.length === 0) {
+      return true;
+    }
+    return batchedChanges[0].direction === direction;
+  }
+
   function getFrontCoords(direction, row, col) {
     switch (direction) {
       case DIRECTION.NORTH:
@@ -256,6 +310,16 @@ export default function App() {
         console.warn(`unknown direction ${direction}`);
         return { r: -1, c: -1 };
     }
+  }
+
+  function getPatternView(direction) {
+    if (
+      batchedChanges.length === 0 ||
+      batchedChanges[0].direction !== direction
+    ) {
+      return getPatternForDirection(getPattern(), direction);
+    }
+    return getPatternForDirection(pendingPattern, direction);
   }
 
   function getPatternForDirection(pattern, direction) {
@@ -307,37 +371,44 @@ export default function App() {
         handleResize={handleResize}
         weights={weights}
         handleWeightChange={handleWeightChange}
+        numBatchedChanges={batchedChanges.length}
+        applyBatchedChanges={applyBatchedChanges}
       />
       <StitchGrid
         label="TOP"
         pattern={getPattern()}
-        updatePixel={updatePixel}
+        updatePixel={updateTopPixel}
         updateCol={updateCol}
         updateRow={updateRow}
+        canEdit={canEdit(DIRECTION.TOP)}
       />
       <StitchGrid
         label="NORTH"
-        pattern={getPatternForDirection(getPattern(), DIRECTION.NORTH)}
-        updatePixel={minimizeDiff(DIRECTION.NORTH)}
+        pattern={getPatternView(DIRECTION.NORTH)}
+        updatePixel={updateViewPixel(DIRECTION.NORTH)}
         allFlat
+        canEdit={canEdit(DIRECTION.NORTH)}
       />
       <StitchGrid
         label="SOUTH"
-        pattern={getPatternForDirection(getPattern(), DIRECTION.SOUTH)}
-        updatePixel={minimizeDiff(DIRECTION.SOUTH)}
+        pattern={getPatternView(DIRECTION.SOUTH)}
+        updatePixel={updateViewPixel(DIRECTION.SOUTH)}
         allFlat
+        canEdit={canEdit(DIRECTION.SOUTH)}
       />
       <StitchGrid
         label="EAST"
-        pattern={getPatternForDirection(getPattern(), DIRECTION.EAST)}
-        updatePixel={minimizeDiff(DIRECTION.EAST)}
+        pattern={getPatternView(DIRECTION.EAST)}
+        updatePixel={updateViewPixel(DIRECTION.EAST)}
         allFlat
+        canEdit={canEdit(DIRECTION.EAST)}
       />
       <StitchGrid
         label="WEST"
-        pattern={getPatternForDirection(getPattern(), DIRECTION.WEST)}
-        updatePixel={minimizeDiff(DIRECTION.WEST)}
+        pattern={getPatternView(DIRECTION.WEST)}
+        updatePixel={updateViewPixel(DIRECTION.WEST)}
         allFlat
+        canEdit={canEdit(DIRECTION.WEST)}
       />
     </div>
   );
