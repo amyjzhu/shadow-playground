@@ -101,7 +101,11 @@ export default function App() {
     };
   }
 
-  useHotkeys("cmd+z", handleUndo, {}, [patternStack]);
+  useHotkeys("cmd+z", handleUndo, {}, [
+    patternStack,
+    batchedChanges,
+    pendingPattern,
+  ]);
 
   function getPattern() {
     return patternStack[0];
@@ -114,12 +118,29 @@ export default function App() {
   }
 
   function handleUndo() {
-    let copy = _.cloneDeep(patternStack);
-    copy.shift();
-    if (copy.length > 0) {
-      setPatternStack(copy);
+    if (batchedChanges.length > 0) {
+      let copy = _.cloneDeep(batchedChanges);
+      copy.shift();
+      setBatchedChanges(copy);
+      let newPendingPattern = _.cloneDeep(getPattern());
+      copy.forEach((change) => {
+        let { row, col } = getCanonicalPixelFromDirection(
+          change.direction,
+          change.viewRow,
+          change.viewCol,
+          getPattern()
+        );
+        newPendingPattern[row][col].colour = colour;
+      });
+      setPendingPattern(newPendingPattern);
     } else {
-      setPatternStack([defaultPattern]);
+      let copy = _.cloneDeep(patternStack);
+      copy.shift();
+      if (copy.length > 0) {
+        setPatternStack(copy);
+      } else {
+        setPatternStack([defaultPattern]);
+      }
     }
   }
 
