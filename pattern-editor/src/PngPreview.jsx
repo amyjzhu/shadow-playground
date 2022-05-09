@@ -2,7 +2,7 @@ import React from "react";
 import { FLAT } from "./constants";
 import Bitmap from "./bitmap";
 
-export default function StitchGrid(props) {
+export default function PngPreview(props) {
   const { pattern, width, height } = props;
 
   function hexToRgb(hexColor) {
@@ -33,18 +33,17 @@ export default function StitchGrid(props) {
 
   return (
     <div>
-      <h2>Bitmaps</h2>
       <div style={styles.container}>
-        <a style={styles.link} href={colourPng} download="colour.bmp">
-          Download Colour Bitmap
+        <a style={styles.link} href={colourPng} download="colour.png">
+          Download Colour PNG
         </a>
-        <img style={styles.image} src={colourPng} alt="colour bitmap" />
+        <img style={styles.image} src={colourPng} alt="colour map" />
       </div>
       <div style={styles.container}>
-        <a style={styles.link} href={stitchPng} download="stitchType.bmp">
-          Download Stitch Type Bitmap
+        <a style={styles.link} href={stitchPng} download="stitchType.png">
+          Download Stitch Type PNG
         </a>
-        <img style={styles.image} src={stitchPng} alt="stitch bitmap" />
+        <img style={styles.image} src={stitchPng} alt="stitch map" />
       </div>
     </div>
   );

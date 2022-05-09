@@ -3,7 +3,7 @@ import _ from "lodash";
 import { useHotkeys } from "react-hotkeys-hook";
 
 import "./styles/App.scss";
-import BmpPreview from "./BmpPreview";
+import PngPreview from "./PngPreview";
 import OptionEditor from "./OptionEditor";
 import StitchGrid from "./StitchGrid";
 import {
@@ -412,7 +412,7 @@ export default function App() {
         canEdit={canEdit(DIRECTION.WEST)}
       />
 
-      <BmpPreview pattern={getPattern()} height={height} width={width} />
+      <PngPreview pattern={getPattern()} height={height} width={width} />
     </div>
   );
 }
