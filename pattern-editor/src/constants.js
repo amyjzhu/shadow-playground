@@ -4,9 +4,9 @@ export const WIDTH = 10;
 export const RAISED = 1;
 export const FLAT = 0;
 
-export const WHITE = "#fff";
-export const GRAY = "#ccc";
-export const BLACK = "#000";
+export const WHITE = "#ffffff";
+export const GRAY = "#cccccc";
+export const BLACK = "#000000";
 
 export const DIRECTION = {
   TOP: "TOP",
