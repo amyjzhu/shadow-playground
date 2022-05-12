@@ -3,44 +3,12 @@ import { FLAT, GRAY } from "./constants";
 import Pixel from "./Pixel";
 
 export default function StitchGrid(props) {
-  const updateRow = props.updateRow;
-  const updateCol = props.updateCol;
   return (
     <div className="stitch-grid">
       <h2 style={{ marginTop: 0 }}>{props.label}</h2>
       <div className="pixels">
-        {updateCol && (
-          <div className="row">
-            <Pixel
-              colour={GRAY}
-              stitchType={FLAT}
-              key={-1}
-              onChange={() => {}}
-              canEdit={props.canEdit}
-            />
-            {props.pattern[0].map((_, j) => (
-              <Pixel
-                colArrow
-                colour={GRAY}
-                stitchType={FLAT}
-                key={j}
-                onChange={() => props.updateCol(j)}
-                canEdit={props.canEdit}
-              />
-            ))}
-          </div>
-        )}
         {props.pattern.map((row, i) => (
           <div className="row" key={i}>
-            {updateRow && (
-              <Pixel
-                rowArrow
-                colour={GRAY}
-                stitchType={FLAT}
-                onChange={() => props.updateRow(i)}
-                canEdit={props.canEdit}
-              />
-            )}
             {row.map((pixel, j) => (
               <Pixel
                 key={j}

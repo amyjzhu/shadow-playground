@@ -158,25 +158,6 @@ export default function App() {
     pushPattern(newPattern);
   }
 
-  function updateRow(row) {
-    let newPattern = _.cloneDeep(getPattern());
-    newPattern[row].forEach((stitch) => {
-      stitch.colour = colour;
-      stitch.type = toggle(stitch.type);
-    });
-    pushPattern(newPattern);
-  }
-
-  function updateCol(col) {
-    let newPattern = _.cloneDeep(getPattern());
-    newPattern.forEach((row) => {
-      const stitch = row[col];
-      stitch.colour = colour;
-      stitch.type = toggle(stitch.type);
-    });
-    pushPattern(newPattern);
-  }
-
   function minimizeDiff(oldPattern, direction, viewRow, viewCol, targetColour) {
     let targetOptions = [
       (pattern, i, j) => (pattern[i][j].type = toggle(pattern[i][j].type)), // change stitch type
@@ -400,8 +381,6 @@ export default function App() {
         label="TOP"
         pattern={getPattern()}
         updatePixel={updateTopPixel}
-        updateCol={updateCol}
-        updateRow={updateRow}
         canEdit={canEdit(DIRECTION.TOP)}
       />
       <StitchGrid
