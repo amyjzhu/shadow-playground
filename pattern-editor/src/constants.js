@@ -1,5 +1,5 @@
-export const HEIGHT = 10;
-export const WIDTH = 10;
+export const HEIGHT = 40;
+export const WIDTH = 40;
 
 export const RAISED = 1;
 export const FLAT = 0;
