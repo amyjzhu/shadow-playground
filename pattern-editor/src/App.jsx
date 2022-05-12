@@ -3,6 +3,7 @@ import _ from "lodash";
 import { useHotkeys } from "react-hotkeys-hook";
 
 import "./styles/App.scss";
+import PngPreview from "./PngPreview";
 import OptionEditor from "./OptionEditor";
 import StitchGrid from "./StitchGrid";
 import {
@@ -431,6 +432,8 @@ export default function App() {
         allFlat
         canEdit={canEdit(DIRECTION.WEST)}
       />
+
+      <PngPreview pattern={getPattern()} height={height} width={width} />
     </div>
   );
 }
