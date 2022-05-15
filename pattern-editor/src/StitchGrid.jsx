@@ -1,5 +1,4 @@
 import React from "react";
-import { FLAT, GRAY } from "./constants";
 import Pixel from "./Pixel";
 
 export default function StitchGrid(props) {
@@ -13,7 +12,6 @@ export default function StitchGrid(props) {
               <Pixel
                 key={j}
                 colour={props.pattern[i][j].colour}
-                stitchType={props.allFlat ? FLAT : props.pattern[i][j].type}
                 onChange={() => props.updatePixel(i, j)}
                 canEdit={props.canEdit}
               />
