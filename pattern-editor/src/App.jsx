@@ -150,7 +150,6 @@ export default function App() {
   }
 
   function updateTopPixel(row, col) {
-    console.log("edit made at " + row + ", " + col);
     let newPattern = _.cloneDeep(getPattern());
     let oldPattern = getPattern();
     newPattern[row][col].colour = colour;

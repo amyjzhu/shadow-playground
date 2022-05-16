@@ -1,7 +1,15 @@
 import React from "react";
 
 export default function Pixel(props) {
-  const { colour, onChange, rowArrow, colArrow, canEdit } = props;
+  const {
+    colour,
+    onChange,
+    rowArrow,
+    colArrow,
+    canEdit,
+    isMouseDown,
+    setMouseDown,
+  } = props;
 
   return (
     <div
@@ -13,6 +21,9 @@ export default function Pixel(props) {
       }}
       className="pixel"
       onClick={canEdit ? onChange : undefined}
+      onMouseDown={() => setMouseDown(true)}
+      onMouseUp={() => setMouseDown(false)}
+      onMouseOver={() => isMouseDown && onChange()}
     >
       {rowArrow && (
         <i style={{ paddingTop: 5 }} className="fa fa-angle-right"></i>

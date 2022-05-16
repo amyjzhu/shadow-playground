@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import Pixel from "./Pixel";
 
 export default function StitchGrid(props) {
+  const [isMouseDown, setMouseDown] = useState(false);
+
   return (
     <div className="stitch-grid">
       <h2 style={{ marginTop: 0 }}>{props.label}</h2>
@@ -14,6 +16,8 @@ export default function StitchGrid(props) {
                 colour={props.pattern[i][j].colour}
                 onChange={() => props.updatePixel(i, j)}
                 canEdit={props.canEdit}
+                isMouseDown={isMouseDown}
+                setMouseDown={setMouseDown}
               />
             ))}
           </div>
