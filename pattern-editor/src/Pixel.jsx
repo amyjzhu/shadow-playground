@@ -16,15 +16,17 @@ export default function Pixel(props) {
       className="pixel"
       onClick={canEdit ? onChange : undefined}
     >
-      {rowArrow && (
-        <i style={{ paddingTop: 5 }} className="fa fa-angle-right"></i>
-      )}
-      {colArrow && (
-        <i style={{ paddingTop: 5 }} className="fa fa-angle-down"></i>
-      )}
+      {rowArrow && <i style={{}} className="fa fa-angle-right"></i>}
+      {colArrow && <i style={{}} className="fa fa-angle-down"></i>}
       {stitchType === RAISED && (
         <i
-          style={{ color: dotColour, paddingTop: 5, fontSize: 8 }}
+          style={{
+            color: dotColour,
+            paddingBottom: 5,
+            fontSize: 5,
+            textAlign: "center",
+            verticalAlign: "middle",
+          }}
           className="fa fa-circle"
         />
       )}
