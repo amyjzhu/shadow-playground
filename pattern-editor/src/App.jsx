@@ -17,14 +17,9 @@ import {
 } from "./constants";
 
 export default function App() {
-  let defaultPattern = [];
-  for (let row = 0; row < HEIGHT; row++) {
-    let patternRow = [];
-    for (let col = 0; col < WIDTH; col++) {
-      patternRow.push({ ...DEFAULT_STITCH });
-    }
-    defaultPattern.push(patternRow);
-  }
+  let defaultPattern = Array(HEIGHT).fill(
+    Array(WIDTH).fill({ ...DEFAULT_STITCH })
+  );
 
   let [patternStack, setPatternStack] = useState([defaultPattern]);
   let [pendingPattern, setPendingPattern] = useState(defaultPattern);

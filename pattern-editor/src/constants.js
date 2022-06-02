@@ -17,3 +17,41 @@ export const DIRECTION = {
 };
 
 export const DEFAULT_STITCH = { colour: GRAY, type: FLAT };
+
+const RED = "#d70e17";
+const YELLOW = "#f0be39";
+const GREEN = "#359d73";
+const BLUE = "#1887ab";
+
+export const COLOR_MAP = {
+  [DIRECTION.TOP]: {
+    TOP: RED,
+    LEFT: YELLOW,
+    BOTTOM: GREEN,
+    RIGHT: BLUE,
+  },
+  [DIRECTION.NORTH]: {
+    TOP: GREEN,
+    LEFT: BLUE,
+    BOTTOM: RED,
+    RIGHT: YELLOW,
+  },
+  [DIRECTION.SOUTH]: {
+    TOP: RED,
+    LEFT: YELLOW,
+    BOTTOM: GREEN,
+    RIGHT: BLUE,
+  },
+  [DIRECTION.EAST]: {
+    TOP: YELLOW,
+    LEFT: GREEN,
+    BOTTOM: BLUE,
+    RIGHT: RED,
+  },
+  [DIRECTION.WEST]: {
+    TOP: BLUE,
+    LEFT: RED,
+    BOTTOM: YELLOW,
+    RIGHT: GREEN,
+  },
+};

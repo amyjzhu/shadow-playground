@@ -2,7 +2,15 @@ import React from "react";
 import { RAISED, WHITE } from "./constants";
 
 export default function Pixel(props) {
-  const { colour, onChange, stitchType, rowArrow, colArrow, canEdit } = props;
+  const {
+    colour,
+    onChange,
+    stitchType,
+    rowArrow,
+    colArrow,
+    canEdit,
+    noBorder,
+  } = props;
   const dotColour = colour === WHITE ? "#ccc" : WHITE;
 
   return (
@@ -10,7 +18,7 @@ export default function Pixel(props) {
       style={{
         opacity: canEdit ? 1 : 0.5,
         backgroundColor: colour,
-        border: "1px solid #D3D3D3",
+        border: `1px solid ${noBorder ? colour : "#D3D3D3"}`,
         cursor: canEdit ? "pointer" : "default",
       }}
       className="pixel"

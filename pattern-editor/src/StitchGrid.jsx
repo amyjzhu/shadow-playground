@@ -1,23 +1,51 @@
 import React from "react";
-import { FLAT, GRAY } from "./constants";
+import { FLAT, GRAY, COLOR_MAP } from "./constants";
 import Pixel from "./Pixel";
 
 export default function StitchGrid(props) {
   const updateRow = props.updateRow;
   const updateCol = props.updateCol;
+
+  function placeholder(key) {
+    return (
+      <Pixel
+        key={key}
+        colour={"#fff"}
+        stitchType={FLAT}
+        canEdit={false}
+        noBorder
+      />
+    );
+  }
+
+  function makeRow(label, side) {
+    const row = [placeholder("a")];
+    if (updateRow) {
+      row.push(placeholder("b"));
+    }
+
+    props.pattern[0].forEach((_, i) => {
+      row.push(
+        <Pixel
+          key={i}
+          colour={COLOR_MAP[label][side]}
+          stitchType={FLAT}
+          canEdit={false}
+          noBorder
+        />
+      );
+    });
+    return row;
+  }
+
   return (
     <div className="stitch-grid">
       <h2 style={{ marginTop: 0 }}>{props.label}</h2>
       <div className="pixels">
         {updateCol && (
           <div className="row">
-            <Pixel
-              colour={GRAY}
-              stitchType={FLAT}
-              key={-1}
-              onChange={() => {}}
-              canEdit={props.canEdit}
-            />
+            {placeholder("first")}
+            {placeholder("second")}
             {props.pattern[0].map((_, j) => (
               <Pixel
                 colArrow
@@ -30,6 +58,9 @@ export default function StitchGrid(props) {
             ))}
           </div>
         )}
+        <div className="row" key="top">
+          {makeRow(props.label, "TOP")}
+        </div>
         {props.pattern.map((row, i) => (
           <div className="row" key={i}>
             {updateRow && (
@@ -41,6 +72,13 @@ export default function StitchGrid(props) {
                 canEdit={props.canEdit}
               />
             )}
+            <Pixel
+              key={"left"}
+              colour={COLOR_MAP[props.label]["LEFT"]}
+              stitchType={FLAT}
+              canEdit={false}
+              noBorder
+            />
             {row.map((pixel, j) => (
               <Pixel
                 key={j}
@@ -50,8 +88,18 @@ export default function StitchGrid(props) {
                 canEdit={props.canEdit}
               />
             ))}
+            <Pixel
+              key={"right"}
+              colour={COLOR_MAP[props.label]["RIGHT"]}
+              stitchType={FLAT}
+              canEdit={false}
+              noBorder
+            />
           </div>
         ))}
+        <div className="row" key="bottom">
+          {makeRow(props.label, "BOTTOM")}
+        </div>
       </div>
     </div>
   );
