@@ -1,6 +1,9 @@
 import React from "react";
 import { FLAT } from "./constants";
 import Bitmap from "./bitmap";
+import JSZip from "jszip";
+import { saveAs } from "file-saver";
+import Button from "@material-ui/core/Button";
 
 export default function PngPreview(props) {
   const { pattern, width, height } = props;
@@ -10,6 +13,18 @@ export default function PngPreview(props) {
     const G = parseInt(hexColor.substr(3, 2), 16) / 255;
     const B = parseInt(hexColor.substr(5, 2), 16) / 255;
     return [R, G, B, 1];
+  }
+
+  function downloadZip() {
+    const zip = new JSZip();
+    zip.file("colour.png", colourPng.substring(22), { base64: true });
+    zip.file("stitchType.png", stitchPng.substring(22), { base64: true });
+    zip.generateAsync({ type: "blob" }).then(function (content) {
+      let filename = prompt("Name this pattern");
+      if (filename) {
+        saveAs(content, `${filename}.zip`);
+      }
+    });
   }
 
   const colourMap = pattern.map((row) => row.map((stitch) => stitch.colour));
@@ -33,26 +48,22 @@ export default function PngPreview(props) {
 
   return (
     <div>
-      <div style={styles.container}>
-        <a style={styles.link} href={colourPng} download="colour.png">
-          Download Colour PNG
-        </a>
-        <img style={styles.image} src={colourPng} alt="colour map" />
-      </div>
-      <div style={styles.container}>
-        <a style={styles.link} href={stitchPng} download="stitchType.png">
-          Download Stitch Type PNG
-        </a>
-        <img style={styles.image} src={stitchPng} alt="stitch map" />
+      <img style={styles.image} src={colourPng} alt="colour map" />
+      <img style={styles.image} src={stitchPng} alt="stitch map" />
+      <div>
+        <Button style={styles.button} variant="outlined" onClick={downloadZip}>
+          Save Pattern
+        </Button>
       </div>
     </div>
   );
 }
 
 const styles = {
-  container: {
-    display: "inline-block",
-    margin: 20,
+  button: {
+    fontSize: "1em",
+    fontWeight: "bold",
+    marginBottom: 20,
   },
   link: {
     display: "block",
@@ -60,6 +71,7 @@ const styles = {
   image: {
     outline: "1px solid black",
     width: 200,
-    marginTop: 20,
+    margin: 20,
+    display: "inline-block",
   },
 };
