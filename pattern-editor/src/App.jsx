@@ -12,6 +12,7 @@ import {
   DEFAULT_STITCH,
   DIRECTION,
   WHITE,
+  BLACK,
   RAISED,
   FLAT,
 } from "./constants";
@@ -27,7 +28,8 @@ export default function App() {
 
   let [patternStack, setPatternStack] = useState([defaultPattern]);
   let [pendingPattern, setPendingPattern] = useState(defaultPattern);
-  let [colour, setColour] = useState(WHITE);
+  let [colourA, setColourA] = useState(BLACK);
+  let [colourB, setColourB] = useState(WHITE);
   let [width, setWidth] = useState(WIDTH);
   let [height, setHeight] = useState(HEIGHT);
   let [weights, setWeights] = useState(
@@ -59,7 +61,8 @@ export default function App() {
   }
 
   function updateViewPixel(direction) {
-    return function (viewRow, viewCol) {
+    return function (viewRow, viewCol, isShiftPressed) {
+      let actualColour = isShiftPressed ? colourB : colourA;
       let { row, col } = getCanonicalPixelFromDirection(
         direction,
         viewRow,
@@ -67,11 +70,11 @@ export default function App() {
         getPattern()
       );
       let newPendingPattern = getPendingPattern(direction);
-      newPendingPattern[row][col].colour = colour;
+      newPendingPattern[row][col].colour = actualColour;
       setPendingPattern(newPendingPattern);
 
       let copy = _.cloneDeep(batchedChanges);
-      copy.unshift({ direction, viewRow, viewCol, colour });
+      copy.unshift({ direction, viewRow, viewCol, colour: actualColour });
       setBatchedChanges(copy);
     };
   }
@@ -130,7 +133,7 @@ export default function App() {
           change.viewCol,
           getPattern()
         );
-        newPendingPattern[row][col].colour = colour;
+        newPendingPattern[row][col].colour = change.colour;
       });
       setPendingPattern(newPendingPattern);
     } else {
@@ -148,29 +151,29 @@ export default function App() {
     return stitchType === RAISED ? FLAT : RAISED;
   }
 
-  function updateTopPixel(row, col) {
+  function updateTopPixel(row, col, isShiftPressed) {
     console.log("edit made at " + row + ", " + col);
     let newPattern = _.cloneDeep(getPattern());
     let oldPattern = getPattern();
-    newPattern[row][col].colour = colour;
+    newPattern[row][col].colour = isShiftPressed ? colourB : colourA;
     newPattern[row][col].type = toggle(oldPattern[row][col].type);
     pushPattern(newPattern);
   }
 
-  function updateRow(row) {
+  function updateRow(row, isShiftPressed) {
     let newPattern = _.cloneDeep(getPattern());
     newPattern[row].forEach((stitch) => {
-      stitch.colour = colour;
+      stitch.colour = isShiftPressed ? colourB : colourA;
       stitch.type = toggle(stitch.type);
     });
     pushPattern(newPattern);
   }
 
-  function updateCol(col) {
+  function updateCol(col, isShiftPressed) {
     let newPattern = _.cloneDeep(getPattern());
     newPattern.forEach((row) => {
       const stitch = row[col];
-      stitch.colour = colour;
+      stitch.colour = isShiftPressed ? colourB : colourA;
       stitch.type = toggle(stitch.type);
     });
     pushPattern(newPattern);
@@ -385,10 +388,12 @@ export default function App() {
     <div>
       <h1>Pattern Editor/Visualizer</h1>
       <OptionEditor
-        colour={colour}
+        colourA={colourA}
+        colourB={colourB}
         height={height}
         width={width}
-        setColour={setColour}
+        setColourA={setColourA}
+        setColourB={setColourB}
         handleResize={handleResize}
         weights={weights}
         handleWeightChange={handleWeightChange}

@@ -30,10 +30,20 @@ export default function OptionEditor(props) {
           }
         />
       </div>
-      <CompactPicker
-        color={props.colour}
-        onChangeComplete={(colour) => props.setColour(colour.hex)}
-      />
+      <div style={styles.container}>
+        <div>Colour A</div>
+        <CompactPicker
+          color={props.colourA}
+          onChangeComplete={(colour) => props.setColourA(colour.hex)}
+        />
+      </div>
+      <div style={styles.container}>
+        <div>Colour B</div>
+        <CompactPicker
+          color={props.colourB}
+          onChangeComplete={(colour) => props.setColourB(colour.hex)}
+        />
+      </div>
       <div>
         <p>Heuristic Weights</p>
         <span style={styles.weightSpan}>
@@ -94,6 +104,10 @@ export default function OptionEditor(props) {
 const styles = {
   button: {
     marginTop: 20,
+  },
+  container: {
+    margin: 10,
+    display: "inline-block",
   },
   textField: {
     padding: 10,

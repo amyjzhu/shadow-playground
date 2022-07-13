@@ -52,7 +52,7 @@ export default function StitchGrid(props) {
                 colour={GRAY}
                 stitchType={FLAT}
                 key={j}
-                onChange={() => props.updateCol(j)}
+                onChange={(e) => props.updateCol(j, e.shiftKey)}
                 canEdit={props.canEdit}
               />
             ))}
@@ -68,7 +68,7 @@ export default function StitchGrid(props) {
                 rowArrow
                 colour={GRAY}
                 stitchType={FLAT}
-                onChange={() => props.updateRow(i)}
+                onChange={(e) => props.updateRow(i, e.shiftKey)}
                 canEdit={props.canEdit}
               />
             )}
@@ -84,7 +84,7 @@ export default function StitchGrid(props) {
                 key={j}
                 colour={props.pattern[i][j].colour}
                 stitchType={props.allFlat ? FLAT : props.pattern[i][j].type}
-                onChange={() => props.updatePixel(i, j)}
+                onChange={(e) => props.updatePixel(i, j, e.shiftKey)}
                 canEdit={props.canEdit}
               />
             ))}
