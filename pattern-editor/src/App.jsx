@@ -17,9 +17,13 @@ import {
 } from "./constants";
 
 export default function App() {
-  let defaultPattern = Array(HEIGHT).fill(
-    Array(WIDTH).fill({ ...DEFAULT_STITCH })
-  );
+  let defaultPattern = Array(HEIGHT)
+    .fill(null)
+    .map(() =>
+      Array(WIDTH)
+        .fill(null)
+        .map(() => ({ ...DEFAULT_STITCH }))
+    );
 
   let [patternStack, setPatternStack] = useState([defaultPattern]);
   let [pendingPattern, setPendingPattern] = useState(defaultPattern);
